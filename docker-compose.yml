@@ -1,0 +1,5 @@
+# Full FYP stack — database + cache. Run from this folder:
+#   docker compose up -d
+# Then start the API from FYP-Backend-main (venv) with app/.env pointing at localhost.
+include:
+  - path: FYP-Backend-main/docker-compose.yml

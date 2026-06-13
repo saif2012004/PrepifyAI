@@ -1,0 +1,33 @@
+{
+  "version": "2026.1-sample",
+  "subjects": [
+    {
+      "id": "physics",
+      "name": "Physics",
+      "shortName": "Phy",
+      "description": "Sample slice — full catalog ships from entryTestSyllabusData.ts",
+      "exams": ["MDCAT", "ECAT"],
+      "chapters": [
+        {
+          "id": "phy-11-motion",
+          "name": "Motion in one & two dimensions",
+          "subjectId": "physics",
+          "classLevel": "11",
+          "topics": [
+            {
+              "id": "phy-11-kinematics-graphs",
+              "name": "Displacement, velocity, acceleration; v–t & s–t graphs",
+              "chapter": "Motion in one & two dimensions",
+              "chapterId": "phy-11-motion",
+              "subjectId": "physics",
+              "classLevel": "11",
+              "boards": ["PTB", "FBISE"],
+              "exams": ["MDCAT", "ECAT"],
+              "tags": ["important", "repeated"]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

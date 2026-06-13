@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Some Expo Web / RN-web shells set body overflow in a way that blocks wheel + laptop touchpad scrolling.
+ * Prefer normal document scroll on web (native uses different roots).
+ */
+html {
+  height: 100%;
+  min-height: 100%;
+}
+body {
+  overflow-x: hidden;
+  overflow-y: auto;
+  min-height: 100%;
+}
+/* Keep RN-web root visible when global styles load after Expo’s inline reset */
+#root {
+  min-height: 100%;
+  flex: 1;
+  display: flex;
+}
+
+/* Remove autofill yellow background */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px white inset !important;
+  -webkit-text-fill-color: #111827 !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Additional autofill styling removal */
+input[data-autocompleted] {
+  background-color: white !important;
+}

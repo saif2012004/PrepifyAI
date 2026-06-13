@@ -1,0 +1,26 @@
+Question generation — safe backup
+================================
+Created: 2026-04-16
+Location: FYP-Backend-main/backups/question_generation_backup_2026-04-16/
+
+This is a COPY of the listed files. Nothing was deleted or moved from the live app tree.
+
+Backed up paths (relative to FYP-Backend-main):
+  app/routes/q.py
+  app/services/generator.py
+  app/services/question_generation_pipeline.py
+  app/services/question_generation_job_runner.py
+  app/services/question_generation_service.py
+  app/schemas/question_gen_route.py
+  app/models/question_generation_job.py
+  app/utils/retriever.py
+  app/utils/question_generator.py
+  app/alembic/versions/add_question_generation_jobs_table.py
+  test_question_api.py
+  test_question_generator.py
+  test_question_generation.py
+  test_question_flow.py
+
+Restore (if ever needed): copy files from this folder back over the same paths under FYP-Backend-main, then restart the API.
+
+Note: route_registry, main.py, config.py, and .env also affect question generation but were not duplicated here to avoid drift; this backup focuses on generation-specific modules and q.py.
