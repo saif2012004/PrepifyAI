@@ -35,6 +35,7 @@ import {
   BarChart3,
 } from 'lucide-react-native';
 import { colors, radii } from '../../theme/colors';
+import { FadeIn, AnimatedCounter, AnimatedProgressBar } from '../../components/animated';
 import {
   type DashboardData,
   EMPTY_DASHBOARD,
@@ -187,17 +188,14 @@ export default function StudentPerformanceDashboardScreen() {
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    console.log('[PerformanceDashboard] load:start');
     setError(null);
     try {
       const next = await loadStudentPerformanceDashboard();
-      console.log('[PerformanceDashboard] load:success', {
-        subjects: next.subject_scores.length,
-        topics: next.topic_performance.length,
-      });
       setData(next);
     } catch (e) {
-      console.log('[PerformanceDashboard] load:error', e);
+      if (typeof __DEV__ !== 'undefined' && __DEV__) {
+        console.warn('[PerformanceDashboard] load failed', e);
+      }
       setError(e instanceof Error ? e.message : 'Could not load performance');
       setData(EMPTY_DASHBOARD);
     } finally {
@@ -207,7 +205,6 @@ export default function StudentPerformanceDashboardScreen() {
   }, []);
 
   useEffect(() => {
-    console.log('[PerformanceDashboard] mount');
     void load();
   }, [load]);
 
@@ -364,26 +361,38 @@ export default function StudentPerformanceDashboardScreen() {
           ) : null}
 
           {/* Overall */}
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Overall performance</Text>
-            <Text style={styles.cardSub}>
-              From your account: overall accuracy, attempts, and charts below (summary, recent days, by topic).
-            </Text>
-            <View style={styles.overallRow}>
-              <View style={styles.overallTile}>
-                <Text style={styles.overallVal}>{data.overall.average_score.toFixed(1)}%</Text>
-                <Text style={styles.overallLbl}>Avg score</Text>
-              </View>
-              <View style={styles.overallTile}>
-                <Text style={styles.overallVal}>{data.overall.accuracy_pct.toFixed(1)}%</Text>
-                <Text style={styles.overallLbl}>Accuracy</Text>
-              </View>
-              <View style={styles.overallTile}>
-                <Text style={styles.overallVal}>{data.overall.total_tests}</Text>
-                <Text style={styles.overallLbl}>Total tests</Text>
+          <FadeIn delay={60} direction="up">
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Overall performance</Text>
+              <Text style={styles.cardSub}>
+                From your account: overall accuracy, attempts, and charts below (summary, recent days, by topic).
+              </Text>
+              <View style={styles.overallRow}>
+                <View style={styles.overallTile}>
+                  <AnimatedCounter
+                    value={data.overall.average_score}
+                    decimals={1}
+                    suffix="%"
+                    style={styles.overallVal}
+                  />
+                  <Text style={styles.overallLbl}>Avg score</Text>
+                </View>
+                <View style={styles.overallTile}>
+                  <AnimatedCounter
+                    value={data.overall.accuracy_pct}
+                    decimals={1}
+                    suffix="%"
+                    style={styles.overallVal}
+                  />
+                  <Text style={styles.overallLbl}>Accuracy</Text>
+                </View>
+                <View style={styles.overallTile}>
+                  <AnimatedCounter value={data.overall.total_tests} style={styles.overallVal} />
+                  <Text style={styles.overallLbl}>Total tests</Text>
+                </View>
               </View>
             </View>
-          </View>
+          </FadeIn>
 
           {/* Alerts */}
           {alerts.length > 0 && (
@@ -616,12 +625,19 @@ export default function StudentPerformanceDashboardScreen() {
                 return (
                   <View key={`${row.subject}-${i}`} style={styles.impBlock}>
                     <Text style={styles.impSubject}>{row.subject}</Text>
-                    <View style={styles.impBarTrack}>
-                      <View style={[styles.impBarPrev, { width: `${wPrev}%` }]} />
-                    </View>
-                    <View style={[styles.impBarTrack, { marginTop: 6 }]}>
-                      <View style={[styles.impBarCur, { width: `${wCur}%` }]} />
-                    </View>
+                    <AnimatedProgressBar
+                      progress={wPrev / 100}
+                      height={10}
+                      color={colors.textSubtle}
+                      trackColor={colors.border}
+                    />
+                    <AnimatedProgressBar
+                      progress={wCur / 100}
+                      height={10}
+                      color={colors.success}
+                      trackColor={colors.border}
+                      style={{ marginTop: 6 }}
+                    />
                     <View style={styles.impLabels}>
                       <Text style={styles.impLblMuted}>Previous {row.previous_pct}%</Text>
                       <Text style={styles.impLbl}>Current {row.current_pct}%</Text>
@@ -635,24 +651,28 @@ export default function StudentPerformanceDashboardScreen() {
           </View>
 
           {/* AI */}
-          <LinearGradient
-            colors={['rgba(99,102,241,0.25)', 'rgba(14,165,233,0.12)']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.aiCard}
-          >
-            <View style={styles.cardHead}>
-              <Sparkles size={22} color={colors.accent} />
-              <Text style={styles.aiTitle}>AI insights</Text>
-            </View>
-            <Text style={styles.aiSub}>Rule-based summary from your scores (replace with LLM later)</Text>
-            {aiLines.map((line, i) => (
-              <View key={i} style={styles.aiBullet}>
-                <Text style={styles.aiBulletDot}>●</Text>
-                <Text style={styles.aiBulletTxt}>{line}</Text>
+          <FadeIn delay={120} direction="up" distance={22}>
+            <LinearGradient
+              colors={['rgba(99,102,241,0.25)', 'rgba(14,165,233,0.12)']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.aiCard}
+            >
+              <View style={styles.cardHead}>
+                <Sparkles size={22} color={colors.accent} />
+                <Text style={styles.aiTitle}>AI insights</Text>
               </View>
-            ))}
-          </LinearGradient>
+              <Text style={styles.aiSub}>Rule-based summary from your scores (replace with LLM later)</Text>
+              {aiLines.map((line, i) => (
+                <FadeIn key={i} delay={180 + i * 80} direction="left" distance={12}>
+                  <View style={styles.aiBullet}>
+                    <Text style={styles.aiBulletDot}>●</Text>
+                    <Text style={styles.aiBulletTxt}>{line}</Text>
+                  </View>
+                </FadeIn>
+              ))}
+            </LinearGradient>
+          </FadeIn>
 
           <Text style={styles.footerNote}>
             Live data loads from the backend when signed in. Legacy dummy JSON remains commented in this file for UI

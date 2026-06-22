@@ -14,6 +14,7 @@ import { ArrowLeft, ScrollText } from 'lucide-react-native';
 import { subjectService, Subject } from '../../services/subjectService';
 import { colors, radii } from '../../theme/colors';
 import { useAuth } from '../../context/AuthContext';
+import { FadeIn, PressableScale } from '../../components/animated';
 
 function isPunjabBoard(board: string): boolean {
   return (board || '').toLowerCase().includes('punjab');
@@ -87,16 +88,18 @@ export default function PastPapersLibraryScreen() {
         {error && !loading && <Text style={styles.err}>{error}</Text>}
 
         {!loading &&
-          subjects.map((s) => (
-            <TouchableOpacity key={s.subject_id} style={styles.row} onPress={() => openSubject(s)} activeOpacity={0.85}>
-              <View style={styles.rowText}>
-                <Text style={styles.subjName}>{s.subject_name}</Text>
-                <Text style={styles.meta}>
-                  Class {s.class_level} · {s.board}
-                </Text>
-              </View>
-              <Text style={styles.chev}>→</Text>
-            </TouchableOpacity>
+          subjects.map((s, index) => (
+            <FadeIn key={s.subject_id} delay={index * 45} direction="up" distance={16}>
+              <PressableScale style={styles.row} onPress={() => openSubject(s)}>
+                <View style={styles.rowText}>
+                  <Text style={styles.subjName}>{s.subject_name}</Text>
+                  <Text style={styles.meta}>
+                    Class {s.class_level} · {s.board}
+                  </Text>
+                </View>
+                <Text style={styles.chev}>→</Text>
+              </PressableScale>
+            </FadeIn>
           ))}
       </ScrollView>
     </SafeAreaView>

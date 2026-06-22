@@ -42,6 +42,7 @@ import PrimaryButton from './PrimaryButton';
 
 import { mcqFromGeneratedItem, mcqOrdinalLabel, resolveMcqCorrectLetter } from '../utils/mcqParse';
 import { McqOptionBody } from './McqOptionBody';
+import { FadeIn } from './animated';
 
 
 
@@ -392,6 +393,8 @@ export default function QuestionPracticeCard({
 
 
   return (
+
+    <FadeIn delay={Math.min(index, 8) * 60} direction="up" distance={18}>
 
     <View style={[styles.card, { borderLeftColor: accentColor }]}>
 
@@ -821,6 +824,8 @@ export default function QuestionPracticeCard({
       )}
 
     </View>
+
+    </FadeIn>
 
   );
 

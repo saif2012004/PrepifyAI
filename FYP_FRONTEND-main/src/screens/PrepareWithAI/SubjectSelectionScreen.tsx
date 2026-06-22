@@ -5,7 +5,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Pressable,
   ActivityIndicator,
   Alert,
 } from 'react-native';
@@ -23,6 +22,7 @@ import {
 } from 'lucide-react-native';
 import { subjectService } from '../../services/subjectService';
 import { colors, radii } from '../../theme/colors';
+import { FadeIn, PressableScale } from '../../components/animated';
 
 // Icon and accent configuration (dark theme: bright icon on translucent fill)
 const subjectConfig: {
@@ -260,28 +260,32 @@ export default function SubjectSelectionScreen() {
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>All subjects (every class)</Text>
               <View style={styles.subjectsGrid}>
-                {subjects.map((subject) => (
-                  <Pressable
+                {subjects.map((subject, index) => (
+                  <FadeIn
                     key={`${subject.id}-${subject.board}-${subject.classLevel}`}
-                    onPress={() => handleSubjectSelect(subject)}
-                    style={({ pressed }) => [
-                      styles.subjectCard,
-                      pressed && styles.subjectCardPressed,
-                    ]}
+                    delay={index * 55}
+                    direction="up"
+                    distance={18}
+                    style={styles.subjectCardWrap}
                   >
-                    <View
-                      style={[
-                        styles.subjectIconContainer,
-                        { backgroundColor: subject.bgColor },
-                      ]}
+                    <PressableScale
+                      onPress={() => handleSubjectSelect(subject)}
+                      style={styles.subjectCard}
                     >
-                      <subject.icon size={32} color={subject.color} />
-                    </View>
-                    <Text style={styles.subjectName}>{subject.name}</Text>
-                    <Text style={styles.subjectDescription}>
-                      {subject.board} • Class {subject.classLevel}
-                    </Text>
-                  </Pressable>
+                      <View
+                        style={[
+                          styles.subjectIconContainer,
+                          { backgroundColor: subject.bgColor },
+                        ]}
+                      >
+                        <subject.icon size={32} color={subject.color} />
+                      </View>
+                      <Text style={styles.subjectName}>{subject.name}</Text>
+                      <Text style={styles.subjectDescription}>
+                        {subject.board} • Class {subject.classLevel}
+                      </Text>
+                    </PressableScale>
+                  </FadeIn>
                 ))}
               </View>
             </View>
@@ -405,8 +409,11 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: 14,
   },
-  subjectCard: {
+  subjectCardWrap: {
     width: '47%',
+  },
+  subjectCard: {
+    width: '100%',
     backgroundColor: colors.surface,
     borderRadius: radii.lg,
     padding: 18,

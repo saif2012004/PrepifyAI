@@ -14,9 +14,15 @@ export default function RootLayout() {
     <AppErrorBoundary>
       <AuthProvider>
         <OfflineSyncBridge />
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="index" />
-          <Stack.Screen name="auth/login" />
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            animation: 'slide_from_right',
+            animationDuration: 280,
+          }}
+        >
+          <Stack.Screen name="index" options={{ animation: 'fade' }} />
+          <Stack.Screen name="auth/login" options={{ animation: 'fade' }} />
           <Stack.Screen name="auth/register" />
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="dashboard/question-generator" />

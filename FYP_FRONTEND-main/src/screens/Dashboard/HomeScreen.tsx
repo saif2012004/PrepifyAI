@@ -6,7 +6,6 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
-  Pressable,
   Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -31,6 +30,7 @@ import {
 } from 'lucide-react-native';
 import { colors, radii } from '../../theme/colors';
 import { performanceService } from '../../services/performanceService';
+import { FadeIn, PressableScale, AnimatedCounter } from '../../components/animated';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -211,67 +211,78 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </View>
 
-          <LinearGradient
-            colors={['rgba(99,102,241,0.35)', 'rgba(14,165,233,0.2)']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.hero}
-          >
-            <View style={styles.heroIconWrap}>
-              <Sparkles color={colors.accent} size={26} />
-            </View>
-            <Text style={styles.heroTitle}>PrepifyAI</Text>
-            <Text style={styles.heroSubtitle}>
-              Exam-ready practice with AI — aligned to your board & class.
-            </Text>
-            <View style={styles.statRow}>
-              <View style={styles.statBox}>
-                <Text style={styles.statLabel}>Accuracy</Text>
-                <Text style={styles.statValue}>
-                  {accuracy != null ? `${accuracy.toFixed(0)}%` : '—'}
-                </Text>
+          <FadeIn delay={80} direction="up">
+            <LinearGradient
+              colors={['rgba(99,102,241,0.35)', 'rgba(14,165,233,0.2)']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.hero}
+            >
+              <View style={styles.heroIconWrap}>
+                <Sparkles color={colors.accent} size={26} />
               </View>
-              <View style={styles.statDivider} />
-              <View style={styles.statBox}>
-                <Text style={styles.statLabel}>Attempts</Text>
-                <Text style={styles.statValue}>
-                  {attempts != null ? String(attempts) : '—'}
-                </Text>
+              <Text style={styles.heroTitle}>PrepifyAI</Text>
+              <Text style={styles.heroSubtitle}>
+                Exam-ready practice with AI — aligned to your board & class.
+              </Text>
+              <View style={styles.statRow}>
+                <View style={styles.statBox}>
+                  <Text style={styles.statLabel}>Accuracy</Text>
+                  {accuracy != null ? (
+                    <AnimatedCounter value={accuracy} suffix="%" style={styles.statValue} />
+                  ) : (
+                    <Text style={styles.statValue}>—</Text>
+                  )}
+                </View>
+                <View style={styles.statDivider} />
+                <View style={styles.statBox}>
+                  <Text style={styles.statLabel}>Attempts</Text>
+                  {attempts != null ? (
+                    <AnimatedCounter value={attempts} style={styles.statValue} />
+                  ) : (
+                    <Text style={styles.statValue}>—</Text>
+                  )}
+                </View>
               </View>
-            </View>
-          </LinearGradient>
+            </LinearGradient>
+          </FadeIn>
 
-          <Text style={styles.sectionLabel}>Start learning</Text>
-          {menuItems.map((item) => {
+          <FadeIn delay={140}>
+            <Text style={styles.sectionLabel}>Start learning</Text>
+          </FadeIn>
+          {menuItems.map((item, index) => {
             const Icon = item.icon;
             return (
-              <Pressable
-                key={item.id}
-                onPress={() => router.push(item.route as never)}
-                style={({ pressed }) => [styles.card, pressed && { opacity: 0.92 }]}
-              >
-                <View style={styles.cardIcon}>
-                  <Icon size={24} color={colors.accent} strokeWidth={2} />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.cardTitle}>{item.title}</Text>
-                  <Text style={styles.cardDesc}>{item.description}</Text>
-                </View>
-                <ChevronRight color={colors.textSubtle} size={22} />
-              </Pressable>
+              <FadeIn key={item.id} delay={180 + index * 60} direction="up" distance={20}>
+                <PressableScale
+                  onPress={() => router.push(item.route as never)}
+                  style={styles.card}
+                >
+                  <View style={styles.cardIcon}>
+                    <Icon size={24} color={colors.accent} strokeWidth={2} />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.cardTitle}>{item.title}</Text>
+                    <Text style={styles.cardDesc}>{item.description}</Text>
+                  </View>
+                  <ChevronRight color={colors.textSubtle} size={22} />
+                </PressableScale>
+              </FadeIn>
             );
           })}
 
-          <View style={styles.tipCard}>
-            <BookOpen size={20} color={colors.primary} />
-            <View style={{ flex: 1, marginLeft: 12 }}>
-              <Text style={styles.tipTitle}>Tip</Text>
-              <Text style={styles.tipBody}>
-                Pick a subject, choose a topic, and generate questions — your progress syncs when
-                you submit answers on the backend.
-              </Text>
+          <FadeIn delay={240}>
+            <View style={styles.tipCard}>
+              <BookOpen size={20} color={colors.primary} />
+              <View style={{ flex: 1, marginLeft: 12 }}>
+                <Text style={styles.tipTitle}>Tip</Text>
+                <Text style={styles.tipBody}>
+                  Pick a subject, choose a topic, and generate questions — your progress syncs when
+                  you submit answers on the backend.
+                </Text>
+              </View>
             </View>
-          </View>
+          </FadeIn>
         </ScrollView>
       </SafeAreaView>
     </View>

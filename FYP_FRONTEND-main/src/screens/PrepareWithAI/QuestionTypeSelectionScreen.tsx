@@ -5,7 +5,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Pressable,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -19,6 +18,7 @@ import {
   ChevronRight,
 } from 'lucide-react-native';
 import { colors, radii } from '../../theme/colors';
+import { FadeIn, PressableScale } from '../../components/animated';
 
 const questionTypes = [
   {
@@ -121,30 +121,30 @@ export default function QuestionTypeSelectionScreen() {
 
           {/* Question Types Grid */}
           <View style={styles.typesContainer}>
-            {questionTypes.map((type) => (
-              <Pressable
-                key={type.id}
-                onPress={() => handleTypeSelect(type.route)}
-                style={({ pressed }) => [
-                  styles.typeCard,
-                  { borderLeftColor: type.color, borderLeftWidth: 4 },
-                  pressed && styles.typeCardPressed,
-                ]}
-              >
-                <View
+            {questionTypes.map((type, index) => (
+              <FadeIn key={type.id} delay={index * 70} direction="up" distance={18}>
+                <PressableScale
+                  onPress={() => handleTypeSelect(type.route)}
                   style={[
-                    styles.typeIconContainer,
-                    { backgroundColor: type.bgColor },
+                    styles.typeCard,
+                    { borderLeftColor: type.color, borderLeftWidth: 4 },
                   ]}
                 >
-                  <type.icon size={28} color={type.color} />
-                </View>
-                <View style={styles.typeContent}>
-                  <Text style={styles.typeName}>{type.name}</Text>
-                  <Text style={styles.typeDescription}>{type.description}</Text>
-                </View>
-                <ChevronRight size={22} color={colors.textSubtle} />
-              </Pressable>
+                  <View
+                    style={[
+                      styles.typeIconContainer,
+                      { backgroundColor: type.bgColor },
+                    ]}
+                  >
+                    <type.icon size={28} color={type.color} />
+                  </View>
+                  <View style={styles.typeContent}>
+                    <Text style={styles.typeName}>{type.name}</Text>
+                    <Text style={styles.typeDescription}>{type.description}</Text>
+                  </View>
+                  <ChevronRight size={22} color={colors.textSubtle} />
+                </PressableScale>
+              </FadeIn>
             ))}
           </View>
 

@@ -18,6 +18,7 @@ import PrimaryButton from '../../components/PrimaryButton';
 import { colors, radii } from '../../theme/colors';
 import { Sparkles } from 'lucide-react-native';
 import { emailDomainTypoHint } from '../../utils/emailHints';
+import { FadeIn } from '../../components/animated';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -84,15 +85,17 @@ export default function LoginScreen() {
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
-            <View style={styles.brand}>
-              <LinearGradient colors={[colors.primary, colors.gradientEnd]} style={styles.brandIcon}>
-                <Sparkles color="#fff" size={28} />
-              </LinearGradient>
-              <Text style={styles.title}>PrepifyAI</Text>
-              <Text style={styles.subtitle}>Sign in to continue your prep journey</Text>
-            </View>
+            <FadeIn delay={60} direction="down" distance={20}>
+              <View style={styles.brand}>
+                <LinearGradient colors={[colors.primary, colors.gradientEnd]} style={styles.brandIcon}>
+                  <Sparkles color="#fff" size={28} />
+                </LinearGradient>
+                <Text style={styles.title}>PrepifyAI</Text>
+                <Text style={styles.subtitle}>Sign in to continue your prep journey</Text>
+              </View>
+            </FadeIn>
 
-            <View style={styles.card}>
+            <FadeIn delay={180} direction="up" distance={24} style={styles.card}>
               <InputField
                 label="Email"
                 value={email}
@@ -148,7 +151,7 @@ export default function LoginScreen() {
               <TouchableOpacity style={styles.adminBtn} onPress={() => router.push('/admin/login')}>
                 <Text style={styles.adminText}>Admin sign in</Text>
               </TouchableOpacity>
-            </View>
+            </FadeIn>
           </ScrollView>
         </KeyboardAvoidingView>
       </SafeAreaView>

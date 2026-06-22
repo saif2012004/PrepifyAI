@@ -17,6 +17,7 @@ import { useRouter } from 'expo-router';
 import { ArrowLeft, Send, Bot, PlusCircle } from 'lucide-react-native';
 import { colors, radii } from '../../theme/colors';
 import { askStudentChatbot, type ChatTurn } from '../../services/chatbotService';
+import { FadeIn } from '../../components/animated';
 
 const QUICK_PROMPTS = [
   'Explain photosynthesis in simple words',
@@ -144,16 +145,23 @@ export default function StudentChatbotScreen() {
           {messages.map((m, idx) => {
             const isUser = m.role === 'user';
             return (
-              <View key={`${m.role}-${idx}`} style={[styles.msgRow, isUser && styles.msgRowUser]}>
-                {!isUser && (
-                  <View style={styles.botBadge}>
-                    <Bot size={14} color={colors.accent} />
+              <FadeIn
+                key={`${m.role}-${idx}`}
+                direction={isUser ? 'left' : 'right'}
+                distance={14}
+                duration={320}
+              >
+                <View style={[styles.msgRow, isUser && styles.msgRowUser]}>
+                  {!isUser && (
+                    <View style={styles.botBadge}>
+                      <Bot size={14} color={colors.accent} />
+                    </View>
+                  )}
+                  <View style={[styles.bubble, isUser ? styles.userBubble : styles.botBubble]}>
+                    <Text style={styles.msgText}>{m.content}</Text>
                   </View>
-                )}
-                <View style={[styles.bubble, isUser ? styles.userBubble : styles.botBubble]}>
-                  <Text style={styles.msgText}>{m.content}</Text>
                 </View>
-              </View>
+              </FadeIn>
             );
           })}
           {busy && (

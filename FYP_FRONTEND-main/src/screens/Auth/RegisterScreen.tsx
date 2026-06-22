@@ -19,6 +19,7 @@ import PrimaryButton from '../../components/PrimaryButton';
 import GoogleSignInButton from '../../components/GoogleSignInButton';
 import { emailDomainTypoHint } from '../../utils/emailHints';
 import { colors, radii } from '../../theme/colors';
+import { FadeIn } from '../../components/animated';
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -97,15 +98,17 @@ export default function RegisterScreen() {
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
-            <View style={styles.brand}>
-              <LinearGradient colors={[colors.primary, colors.gradientEnd]} style={styles.brandIcon}>
-                <Sparkles color="#fff" size={28} />
-              </LinearGradient>
-              <Text style={styles.title}>Create account</Text>
-              <Text style={styles.subtitle}>Join PrepifyAI on your phone</Text>
-            </View>
+            <FadeIn delay={60} direction="down" distance={20}>
+              <View style={styles.brand}>
+                <LinearGradient colors={[colors.primary, colors.gradientEnd]} style={styles.brandIcon}>
+                  <Sparkles color="#fff" size={28} />
+                </LinearGradient>
+                <Text style={styles.title}>Create account</Text>
+                <Text style={styles.subtitle}>Join PrepifyAI on your phone</Text>
+              </View>
+            </FadeIn>
 
-            <View style={styles.card}>
+            <FadeIn delay={180} direction="up" distance={24} style={styles.card}>
               <InputField
                 label="Full name"
                 value={name}
@@ -172,7 +175,7 @@ export default function RegisterScreen() {
                   <Text style={styles.link}>Sign in</Text>
                 </TouchableOpacity>
               </View>
-            </View>
+            </FadeIn>
           </ScrollView>
         </KeyboardAvoidingView>
       </SafeAreaView>
