@@ -17,6 +17,7 @@ import {
 } from '../../syllabus';
 import type { ClassLevel, EntryExam, EntrySubjectId, SyllabusFilters, SyllabusTag } from '../../syllabus';
 import { colors, radii } from '../../theme/colors';
+import { FadeIn } from '../animated';
 
 const EXAMS: Array<{ value: EntryExam | 'all'; label: string }> = [
   { value: 'all', label: 'All exams' },
@@ -147,11 +148,11 @@ export default function EntryTestSyllabusBrowser() {
           {filteredSubjects.length === 0 ? (
             <Text style={styles.empty}>No topics match. Try &quot;All exams&quot; or clear search.</Text>
           ) : (
-            filteredSubjects.map((sub) => {
+            filteredSubjects.map((sub, index) => {
               const open = !!openSubjects[sub.id];
               const topicCount = sub.chapters.reduce((n, ch) => n + ch.topics.length, 0);
               return (
-                <View key={sub.id} style={styles.subjectCard}>
+                <FadeIn key={sub.id} delay={Math.min(index, 10) * 50} direction="up" distance={16} style={styles.subjectCard}>
                   <TouchableOpacity style={styles.subjectHead} onPress={() => toggleSubject(sub.id)} activeOpacity={0.88}>
                     <View style={{ flex: 1, minWidth: 0 }}>
                       <Text style={styles.subjectName}>{sub.name}</Text>
@@ -229,7 +230,7 @@ export default function EntryTestSyllabusBrowser() {
                       })}
                     </View>
                   ) : null}
-                </View>
+                </FadeIn>
               );
             })
           )}

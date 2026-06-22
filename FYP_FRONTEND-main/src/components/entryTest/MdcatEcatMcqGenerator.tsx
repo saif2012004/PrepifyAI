@@ -20,6 +20,7 @@ import { questionService, type GeneratedQuestionItem, type DifficultyUi } from '
 import { mcqFromGeneratedItem, mcqOrdinalLabel, splitBilingualOptionLines } from '../../utils/mcqParse';
 import { syllabusTopicChipsForMcq } from '../../syllabus';
 import { colors, radii } from '../../theme/colors';
+import { FadeIn } from '../animated';
 import {
   COUNT_OPTIONS,
   TIMER_PRESETS,
@@ -483,7 +484,7 @@ export default function MdcatEcatMcqGenerator() {
                 const optionsLocked = (checked && !quizMode) || (quizMode && quizFinished);
 
                 return (
-                  <View key={`${q.question_id}-${idx}`} style={styles.qCard}>
+                  <FadeIn key={`${q.question_id}-${idx}`} delay={Math.min(idx, 8) * 55} direction="up" distance={16} style={styles.qCard}>
                     <View style={styles.qHead}>
                       <Text style={styles.qBadge}>Q{idx + 1}</Text>
                       <Text style={styles.qMeta}>
@@ -560,7 +561,7 @@ export default function MdcatEcatMcqGenerator() {
                         <Text style={styles.answerExpl}>{shortExplanation(q, correct)}</Text>
                       </View>
                     ) : null}
-                  </View>
+                  </FadeIn>
                 );
               })}
 
