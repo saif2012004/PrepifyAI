@@ -262,11 +262,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-  typeCardPressed: {
-    transform: [{ scale: 0.99 }],
-    opacity: 0.92,
-    borderColor: colors.primary,
-  },
   typeIconContainer: {
     width: 56,
     height: 56,

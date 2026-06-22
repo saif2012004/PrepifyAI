@@ -421,11 +421,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-  subjectCardPressed: {
-    transform: [{ scale: 0.98 }],
-    opacity: 0.92,
-    borderColor: colors.primary,
-  },
   subjectIconContainer: {
     width: 64,
     height: 64,
