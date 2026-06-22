@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useRouter } from 'expo-router';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   ENTRY_TEST_SYLLABUS_CATALOG,
   filterSyllabusCatalog,
@@ -73,7 +74,12 @@ export default function EntryTestSyllabusBrowser() {
   return (
     <div className="min-h-screen min-h-[100dvh] w-full overflow-x-hidden overflow-y-visible bg-slate-950 text-slate-100 selection:bg-emerald-500/25 [&_button:not(:disabled)]:cursor-pointer [&_button:disabled]:cursor-not-allowed">
       <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
-        <header className="mb-8">
+        <motion.header
+          className="mb-8"
+          initial={{ opacity: 0, y: -16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+        >
           <button
             type="button"
             onClick={() => router.back()}
@@ -108,11 +114,14 @@ export default function EntryTestSyllabusBrowser() {
               ↓
             </span>
           </button>
-        </header>
+        </motion.header>
 
-        <section
+        <motion.section
           id="entry-test-syllabus-scroll-target"
           className="mb-8 scroll-mt-6 rounded-2xl border border-slate-700/80 bg-slate-900/80 p-5 shadow-xl shadow-black/40 sm:p-6"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
         >
           <h2 className="text-sm font-bold uppercase tracking-wide text-slate-400">Filters</h2>
           <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-4">
@@ -169,7 +178,7 @@ export default function EntryTestSyllabusBrowser() {
               />
             </div>
           </div>
-        </section>
+        </motion.section>
 
         {filteredSubjects.length === 0 ? (
           <p className="rounded-xl border border-slate-700 bg-slate-900/60 px-4 py-8 text-center text-sm text-slate-400">
@@ -177,13 +186,16 @@ export default function EntryTestSyllabusBrowser() {
           </p>
         ) : (
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            {filteredSubjects.map((sub) => {
+            {filteredSubjects.map((sub, index) => {
               const open = !!openSubjects[sub.id];
               const topicCount = sub.chapters.reduce((n, ch) => n + ch.topics.length, 0);
               return (
-                <div
+                <motion.div
                   key={sub.id}
                   className="flex flex-col overflow-x-hidden overflow-y-visible rounded-2xl border border-slate-700/90 bg-gradient-to-b from-slate-900 to-slate-950 shadow-lg shadow-black/30"
+                  initial={{ opacity: 0, y: 18 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: Math.min(index, 10) * 0.05, ease: [0.22, 1, 0.36, 1] }}
                 >
                   <button
                     type="button"
@@ -214,8 +226,15 @@ export default function EntryTestSyllabusBrowser() {
                     </div>
                   </button>
 
+                  <AnimatePresence initial={false}>
                   {open ? (
-                    <div className="border-t border-slate-700/80 px-3 pb-4 pt-1">
+                    <motion.div
+                      className="overflow-hidden border-t border-slate-700/80 px-3 pb-4 pt-1"
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3, ease: 'easeInOut' }}
+                    >
                       {sub.chapters.map((ch) => {
                         const chOpen = !!openChapters[ch.id];
                         return (
@@ -233,8 +252,15 @@ export default function EntryTestSyllabusBrowser() {
                               </span>
                               <span className="text-slate-500">{chOpen ? '−' : '+'}</span>
                             </button>
+                            <AnimatePresence initial={false}>
                             {chOpen ? (
-                              <ul className="space-y-2 border-t border-slate-800 px-3 py-3">
+                              <motion.ul
+                                className="space-y-2 overflow-hidden border-t border-slate-800 px-3 py-3"
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.25, ease: 'easeInOut' }}
+                              >
                                 {ch.topics.map((t) => {
                                   const isImportant = t.tags.includes('important');
                                   return (
@@ -275,14 +301,16 @@ export default function EntryTestSyllabusBrowser() {
                                     </li>
                                   );
                                 })}
-                              </ul>
+                              </motion.ul>
                             ) : null}
+                            </AnimatePresence>
                           </div>
                         );
                       })}
-                    </div>
+                    </motion.div>
                   ) : null}
-                </div>
+                  </AnimatePresence>
+                </motion.div>
               );
             })}
           </div>

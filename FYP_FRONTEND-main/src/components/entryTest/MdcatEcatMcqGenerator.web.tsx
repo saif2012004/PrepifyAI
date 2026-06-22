@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useRouter } from 'expo-router';
+import { motion } from 'framer-motion';
 import { questionService, type GeneratedQuestionItem, type DifficultyUi } from '../../services/questionService';
 import { mcqFromGeneratedItem, mcqOrdinalLabel, splitBilingualOptionLines } from '../../utils/mcqParse';
 import { syllabusTopicChipsForMcq } from '../../syllabus';
@@ -200,7 +201,12 @@ export default function MdcatEcatMcqGenerator() {
   return (
     <div className="min-h-screen min-h-[100dvh] w-full overflow-x-hidden overflow-y-visible bg-slate-950 text-slate-100 selection:bg-cyan-500/25 [&_a]:cursor-pointer [&_button:not(:disabled)]:cursor-pointer [&_button:disabled]:cursor-not-allowed">
       <div className="mx-auto w-full max-w-5xl px-3 py-6 sm:px-5 sm:py-8 lg:px-8">
-        <header className="mb-8 flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between lg:gap-8">
+        <motion.header
+          className="mb-8 flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between lg:gap-8"
+          initial={{ opacity: 0, y: -16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+        >
           <div className="min-w-0 flex-1 lg:max-w-3xl">
             <button
               type="button"
@@ -243,11 +249,14 @@ export default function MdcatEcatMcqGenerator() {
               </p>
             </div>
           ) : null}
-        </header>
+        </motion.header>
 
-        <section
+        <motion.section
           id="entry-test-mcq-lab-scroll-target"
           className="mb-8 scroll-mt-6 rounded-2xl border border-slate-700/80 bg-slate-900/80 p-4 shadow-xl shadow-black/40 sm:p-5 md:p-6"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
         >
           <h2 className="text-sm font-bold uppercase tracking-wide text-slate-400">Configuration</h2>
           <div className="mt-4 grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
@@ -381,7 +390,7 @@ export default function MdcatEcatMcqGenerator() {
             </button>
           </div>
           {error ? <p className="mt-4 text-sm font-medium text-rose-400">{error}</p> : null}
-        </section>
+        </motion.section>
 
         {questions.length > 0 ? (
           <div id="entry-test-mcq-questions" className="scroll-mt-6">
@@ -524,9 +533,12 @@ export default function MdcatEcatMcqGenerator() {
                 const optionsLocked = (checked && !quizMode) || (quizMode && quizFinished);
 
                 return (
-                  <article
+                  <motion.article
                     key={`${q.question_id}-${idx}`}
                     className="rounded-2xl border border-slate-700/90 bg-gradient-to-br from-slate-900 to-slate-900/40 p-4 shadow-lg sm:p-5"
+                    initial={{ opacity: 0, y: 18 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: Math.min(idx, 8) * 0.05, ease: [0.22, 1, 0.36, 1] }}
                   >
                     <div className="mb-3 flex items-start justify-between gap-3">
                       <span className="rounded-lg bg-slate-800 px-2 py-1 text-xs font-black text-cyan-300">
@@ -590,7 +602,7 @@ export default function MdcatEcatMcqGenerator() {
                         <p className="mt-2 text-sm leading-relaxed text-slate-400">{shortExplanation(q, correct)}</p>
                       </div>
                     ) : null}
-                  </article>
+                  </motion.article>
                 );
               })}
             </div>
