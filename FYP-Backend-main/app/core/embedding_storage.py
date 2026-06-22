@@ -3,10 +3,13 @@ Embedding storage configuration and compatibility layer.
 Supports both pgvector (native vector type) and JSON storage.
 """
 
+import logging
 import os
 from typing import Type, Union
 from sqlalchemy import Column, JSON, String
 from sqlalchemy.types import TypeDecorator
+
+logger = logging.getLogger(__name__)
 
 # Check if we're using pgvector or JSON storage
 USE_PGVECTOR = os.getenv("USE_PGVECTOR", "true").lower() == "true"
@@ -17,7 +20,7 @@ if USE_PGVECTOR:
         EMBEDDING_DIMENSION = 384
         EmbeddingType = Vector(EMBEDDING_DIMENSION)
     except ImportError:
-        print("  pgvector not available, falling back to JSON storage")
+        logger.warning("pgvector not available, falling back to JSON storage")
         EmbeddingType = JSON
         USE_PGVECTOR = False
 else:

@@ -13,15 +13,19 @@ from pdf2image.exceptions import PDFInfoNotInstalledError, PDFPageCountError
 from sentence_transformers import SentenceTransformer
 from pathlib import Path
 from typing import List, Dict, Tuple, Optional
+import logging
 import unicodedata
 
 from app.core.config import settings
 
+logger = logging.getLogger(__name__)
+
+
 class RobustPastPaperProcessor:
     def __init__(self):
-        print("Loading all-MiniLM-L6-v2 model...")
+        logger.info("Loading all-MiniLM-L6-v2 model...")
         self.model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
-        print("Model loaded successfully!")
+        logger.info("SentenceTransformer model loaded successfully")
         self._configure_tesseract()
         self.poppler_path = self._resolve_poppler_path()
         
@@ -43,9 +47,9 @@ class RobustPastPaperProcessor:
         if candidate:
             expanded = Path(candidate).expanduser()
             if expanded.exists():
-                print(f"Using poppler from: {expanded}")
+                logger.info("Using poppler from: %s", expanded)
                 return str(expanded)
-            print(f"POPPLER_PATH is set but does not exist: {expanded}")
+            logger.warning("POPPLER_PATH is set but does not exist: %s", expanded)
         return None
         
     def extract_english_only(self, text: str) -> str:
@@ -141,7 +145,6 @@ class RobustPastPaperProcessor:
     
     def extract_text_with_ocr(self, pdf_path: str) -> str:
         """Extract text from PDF using OCR for scanned documents"""
-        print(f"Converting PDF to images for OCR...")
         try:
             # First try regular text extraction
             with open(pdf_path, 'rb') as file:
@@ -149,16 +152,15 @@ class RobustPastPaperProcessor:
                 text = ""
                 for page in pdf_reader.pages:
                     text += page.extract_text() + "\n"
-                
+
                 # If text is too short, likely scanned - use OCR
                 if len(text.strip()) < 100:
-                    print("PDF appears to be scanned. Using OCR...")
+                    logger.info("PDF appears to be scanned; falling back to OCR")
                     text = self._ocr_pdf(pdf_path)
-                
+
                 return text
         except Exception as e:
-            print(f"Error reading {pdf_path}: {e}")
-            print("Attempting OCR...")
+            logger.warning("Direct text extraction failed for %s (%s); attempting OCR", pdf_path, e)
             return self._ocr_pdf(pdf_path)
     
     def _ocr_pdf(self, pdf_path: str) -> str:
@@ -167,20 +169,20 @@ class RobustPastPaperProcessor:
             poppler_args = {"poppler_path": self.poppler_path} if self.poppler_path else {}
             images = convert_from_path(pdf_path, dpi=300, **poppler_args)
             full_text = ""
-            
+
             for i, image in enumerate(images):
-                print(f"  OCR processing page {i+1}/{len(images)}...")
+                logger.debug("OCR processing page %d/%d", i + 1, len(images))
                 page_text = pytesseract.image_to_string(image, lang='eng')
                 full_text += page_text + "\n\n"
-            
+
             return full_text
         except (PDFInfoNotInstalledError, PDFPageCountError) as e:
-            print(f"OCR failed: {e}")
+            logger.error("OCR failed (poppler not available?): %s", e)
             if not self.poppler_path:
-                print("Hint: set POPPLER_PATH to the poppler 'bin' directory (e.g. C:/poppler/Library/bin).")
+                logger.error("Hint: set POPPLER_PATH to the poppler 'bin' directory (e.g. C:/poppler/Library/bin).")
             return ""
         except Exception as e:
-            print(f"OCR failed: {e}")
+            logger.error("OCR failed: %s", e)
             return ""
     
     def extract_metadata_from_filename(self, filename: str) -> Dict:
@@ -303,8 +305,8 @@ class RobustPastPaperProcessor:
       # Basic cleaning steps
       section_text = self.clean_ocr_artifacts(section_text)
       section_text = self.extract_english_only(section_text)
-      
-      print("Extracted Text before cleaning: \n", section_text)
+
+      logger.debug("MCQ section text before cleaning (%d chars)", len(section_text))
 
       section_text = self.clean_mcq_text(section_text)
 
@@ -342,7 +344,7 @@ class RobustPastPaperProcessor:
                       "question_text": part,
                       "question_type": q["question_type"],
                       "marks": q.get("marks", 1),
-                      "embedding": embeddings[i].tolist() if i < len(embeddings) else q["embedding"]
+                      "embedding": embeddings[i].tolist() if i < len(embeddings) else q.get("embedding")
                   })
           else:
               split_questions.append(q)
@@ -511,13 +513,12 @@ class RobustPastPaperProcessor:
             section_content = self.find_section(content, section_letter)
             
             if section_content:
-                print(f"  Found Section {section_letter}")
                 questions = extractor_func(section_content)
-                print(f"  Extracted {len(questions)} {q_type} questions")
+                logger.info("Section %s: extracted %d %s question(s)", section_letter, len(questions), q_type)
                 all_questions.extend(questions)
             else:
-                print(f"  Section {section_letter} not found or empty")
-        
+                logger.info("Section %s not found or empty", section_letter)
+
         return all_questions
     
     def generate_embeddings(self, questions: List[Dict]) -> List[Dict]:
@@ -526,10 +527,10 @@ class RobustPastPaperProcessor:
             return []
         
         question_texts = [q["question_text"] for q in questions]
-        print(f"  Generating embeddings for {len(question_texts)} questions...")
-        
+        logger.info("Generating embeddings for %d questions", len(question_texts))
+
         # Generate embeddings in batch
-        embeddings = self.model.encode(question_texts, show_progress_bar=True)
+        embeddings = self.model.encode(question_texts, show_progress_bar=False)
         
         # Add embeddings to questions
         for i, question in enumerate(questions):
@@ -540,34 +541,35 @@ class RobustPastPaperProcessor:
     def process_single_paper(self, pdf_path: str, paper_id: int, output_dir: str = "output"):
         """Process a single paper and save to individual JSON file"""
         filename = Path(pdf_path).stem
-        print(f"\n{'='*70}")
-        print(f"Processing: {filename}")
-        print(f"{'='*70}")
-        
+        logger.info("Processing past paper: %s", filename)
+
         # Extract text with OCR
         content = self.extract_text_with_ocr(pdf_path)
         if not content or len(content.strip()) < 50:
-            print(f"❌ Could not extract meaningful text from {pdf_path}")
+            logger.warning("Could not extract meaningful text from %s", pdf_path)
             return None
-        
-        print(f"✓ Extracted {len(content)} characters")
-        
+
+        logger.info("Extracted %d characters of text", len(content))
+
         # Extract metadata
         filename_metadata = self.extract_metadata_from_filename(filename)
         metadata = self.extract_metadata_from_content(content, filename_metadata)
         metadata["paper_id"] = paper_id
         metadata["filename"] = filename
-        
-        print(f"✓ Metadata: {metadata['year']} | {metadata['board']} | {metadata['subject']} | {metadata['class']}")
-        
+
+        logger.info(
+            "Metadata: %s | %s | %s | %s",
+            metadata['year'], metadata['board'], metadata['subject'], metadata['class'],
+        )
+
         # Parse questions
         questions = self.parse_questions(content)
-        
+
         if not questions:
-            print(f"  No questions extracted from {pdf_path}")
+            logger.warning("No questions extracted from %s", pdf_path)
             return None
-        
-        print(f"✓ Total questions found: {len(questions)}")
+
+        logger.info("Total questions found: %d", len(questions))
         
         # Generate embeddings
         questions = self.generate_embeddings(questions)
@@ -597,16 +599,13 @@ class RobustPastPaperProcessor:
             
             with open(output_file, 'w', encoding='utf-8') as f:
                 json.dump(output_data, f, indent=2, ensure_ascii=False)
-            
-            print(f"✓ Saved to {output_file}")
-            print(f"  MCQs: {output_data['stats']['mcqs']}")
-            print(f"  Short: {output_data['stats']['short_questions']}")
-            print(f"  Long: {output_data['stats']['long_questions']}")
-        else:
-            print(f"✓ Processed (no file output)")
-            print(f"  MCQs: {output_data['stats']['mcqs']}")
-            print(f"  Short: {output_data['stats']['short_questions']}")
-            print(f"  Long: {output_data['stats']['long_questions']}")
+
+            logger.info("Saved extracted paper to %s", output_file)
+        stats = output_data['stats']
+        logger.info(
+            "Extraction stats — MCQs: %d, Short: %d, Long: %d",
+            stats['mcqs'], stats['short_questions'], stats['long_questions'],
+        )
         
         return output_data
     
