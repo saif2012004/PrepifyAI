@@ -27,6 +27,7 @@ import {
 import { usePrepParams } from '../../hooks/usePrepParams';
 import { colors, radii } from '../../theme/colors';
 import QuestionPracticeCard from '../../components/QuestionPracticeCard';
+import { FadeIn } from '../../components/animated';
 
 export default function PracticeSetupScreen() {
   const router = useRouter();
@@ -242,7 +243,7 @@ export default function PracticeSetupScreen() {
         </View>
 
         <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
-          <View style={styles.panel}>
+          <FadeIn delay={60} direction="up" distance={18} style={styles.panel}>
             <InputField
               label="Topic"
               value={topic}
@@ -314,7 +315,7 @@ export default function PracticeSetupScreen() {
               loading={loading}
               color={colors.primary}
             />
-          </View>
+          </FadeIn>
 
           {loading && (
             <View style={styles.loadingBox}>

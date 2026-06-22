@@ -13,6 +13,7 @@ import { ArrowLeft, FileText } from 'lucide-react-native';
 import { listLibraryPdfs, LibraryPdfItem } from '../../services/bookLibraryService';
 import { subjectService } from '../../services/subjectService';
 import { colors, radii } from '../../theme/colors';
+import { FadeIn, PressableScale } from '../../components/animated';
 
 function formatSize(bytes: number | null): string {
   if (bytes == null || bytes <= 0) return '';
@@ -110,29 +111,29 @@ export default function BooksForSubjectScreen() {
         )}
 
         {!loading &&
-          items.map((b) => (
-            <TouchableOpacity
-              key={b.book_id}
-              style={styles.row}
-              onPress={() =>
-                router.push({
-                  pathname: '/books/view/[bookId]',
-                  params: { bookId: String(b.book_id), title: b.title },
-                })
-              }
-              activeOpacity={0.85}
-            >
-              <FileText size={22} color={colors.accent} />
-              <View style={styles.rowText}>
-                <Text style={styles.bookTitle} numberOfLines={2}>
-                  {b.title}
-                </Text>
-                {b.file_size_bytes ? (
-                  <Text style={styles.meta}>{formatSize(b.file_size_bytes)}</Text>
-                ) : null}
-              </View>
-              <Text style={styles.chev}>→</Text>
-            </TouchableOpacity>
+          items.map((b, index) => (
+            <FadeIn key={b.book_id} delay={index * 45} direction="up" distance={16}>
+              <PressableScale
+                style={styles.row}
+                onPress={() =>
+                  router.push({
+                    pathname: '/books/view/[bookId]',
+                    params: { bookId: String(b.book_id), title: b.title },
+                  })
+                }
+              >
+                <FileText size={22} color={colors.accent} />
+                <View style={styles.rowText}>
+                  <Text style={styles.bookTitle} numberOfLines={2}>
+                    {b.title}
+                  </Text>
+                  {b.file_size_bytes ? (
+                    <Text style={styles.meta}>{formatSize(b.file_size_bytes)}</Text>
+                  ) : null}
+                </View>
+                <Text style={styles.chev}>→</Text>
+              </PressableScale>
+            </FadeIn>
           ))}
       </ScrollView>
     </SafeAreaView>

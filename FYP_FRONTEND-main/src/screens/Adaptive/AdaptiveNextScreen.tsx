@@ -13,6 +13,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { ArrowLeft, Sparkles } from 'lucide-react-native';
 import { colors, radii } from '../../theme/colors';
+import { FadeIn, AnimatedProgressBar } from '../../components/animated';
 import { subjectService, Subject } from '../../services/subjectService';
 import {
   adaptiveService,
@@ -296,7 +297,7 @@ export default function AdaptiveNextScreen() {
           )}
 
           {session && (
-            <View style={styles.card}>
+            <FadeIn direction="up" distance={18} style={styles.card}>
               <Text style={styles.sessionTitle}>Smart Practice Plan</Text>
               <Text style={styles.sessionGoal}>{session.practice_goal}</Text>
 
@@ -312,9 +313,13 @@ export default function AdaptiveNextScreen() {
               </Text>
 
               <Text style={styles.sectionMini}>Progress indicator</Text>
-              <View style={styles.progressTrack}>
-                <View style={[styles.progressFill, { width: `${progressPercent}%` }]} />
-              </View>
+              <AnimatedProgressBar
+                progress={progressPercent / 100}
+                height={10}
+                color={colors.accent}
+                trackColor={colors.bgElevated}
+                style={{ marginBottom: 6 }}
+              />
               <Text style={styles.metaStrong}>{session.engagement.progress_indicator}</Text>
 
               <Text style={styles.sectionMini}>Adaptive flow</Text>
@@ -346,7 +351,7 @@ export default function AdaptiveNextScreen() {
 
               <Text style={styles.meta}>{session.engagement.encouragement}</Text>
               <Text style={styles.nextStep}>Next step: {session.next_step_recommendation}</Text>
-            </View>
+            </FadeIn>
           )}
         </ScrollView>
       </SafeAreaView>
@@ -427,19 +432,6 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
   },
   topicChipText: { color: colors.text, fontSize: 12, fontWeight: '600' },
-  progressTrack: {
-    height: 10,
-    borderRadius: 999,
-    backgroundColor: colors.bgElevated,
-    borderWidth: 1,
-    borderColor: colors.border,
-    overflow: 'hidden',
-    marginBottom: 6,
-  },
-  progressFill: {
-    height: '100%',
-    backgroundColor: colors.accent,
-  },
   metaStrong: { color: colors.accent, fontSize: 13, fontWeight: '700', marginTop: 8 },
   nextStep: { color: colors.text, fontSize: 13, fontWeight: '700', marginTop: 8 },
   planStatusPill: {

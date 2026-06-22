@@ -13,6 +13,7 @@ import { ArrowLeft, FileStack } from 'lucide-react-native';
 import { listPastPapersForSubject, type PastPaperSummary } from '../../services/pastPaperService';
 import { subjectService } from '../../services/subjectService';
 import { colors, radii } from '../../theme/colors';
+import { FadeIn, PressableScale } from '../../components/animated';
 
 function isPunjabBoard(board: string): boolean {
   return (board || '').toLowerCase().includes('punjab');
@@ -118,35 +119,35 @@ export default function PastPapersForSubjectScreen() {
         )}
 
         {!loading &&
-          sorted.map((p) => (
-            <TouchableOpacity
-              key={p.paper_id}
-              style={styles.row}
-              onPress={() =>
-                router.push({
-                  pathname: '/past-papers/paper/[paperId]',
-                  params: {
-                    paperId: String(p.paper_id),
-                    subjectId: String(sid),
-                    subjectName: subjectName ? String(subjectName) : headerLabel,
-                    year: String(p.year),
-                    board: p.board,
-                    classLevel: classLevel ? String(classLevel) : undefined,
-                    hasPdf: p.has_pdf ? '1' : '0',
-                  },
-                })
-              }
-              activeOpacity={0.85}
-            >
-              <FileStack size={22} color={colors.accent} />
-              <View style={styles.rowText}>
-                <Text style={styles.paperTitle}>
-                  {p.year} · {p.board}
-                </Text>
-                <Text style={styles.meta}>{p.has_pdf ? 'Tap to open PDF' : 'Tap to open'}</Text>
-              </View>
-              <Text style={styles.chev}>→</Text>
-            </TouchableOpacity>
+          sorted.map((p, index) => (
+            <FadeIn key={p.paper_id} delay={index * 45} direction="up" distance={16}>
+              <PressableScale
+                style={styles.row}
+                onPress={() =>
+                  router.push({
+                    pathname: '/past-papers/paper/[paperId]',
+                    params: {
+                      paperId: String(p.paper_id),
+                      subjectId: String(sid),
+                      subjectName: subjectName ? String(subjectName) : headerLabel,
+                      year: String(p.year),
+                      board: p.board,
+                      classLevel: classLevel ? String(classLevel) : undefined,
+                      hasPdf: p.has_pdf ? '1' : '0',
+                    },
+                  })
+                }
+              >
+                <FileStack size={22} color={colors.accent} />
+                <View style={styles.rowText}>
+                  <Text style={styles.paperTitle}>
+                    {p.year} · {p.board}
+                  </Text>
+                  <Text style={styles.meta}>{p.has_pdf ? 'Tap to open PDF' : 'Tap to open'}</Text>
+                </View>
+                <Text style={styles.chev}>→</Text>
+              </PressableScale>
+            </FadeIn>
           ))}
       </ScrollView>
     </SafeAreaView>

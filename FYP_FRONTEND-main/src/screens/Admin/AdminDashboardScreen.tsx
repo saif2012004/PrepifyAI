@@ -25,6 +25,7 @@ import {
   Library,
 } from 'lucide-react-native';
 import { useAuth } from '../../context/AuthContext';
+import { FadeIn, PressableScale } from '../../components/animated';
 import {
   adminDashboardService,
   type AccuracyRunRow,
@@ -217,13 +218,15 @@ export default function AdminDashboardScreen() {
 
         <View style={styles.statsGrid}>
           {stats.map((stat, index) => (
-            <View key={index} style={styles.statCard}>
-              <View style={[styles.statIcon, { backgroundColor: `${stat.color}15` }]}>
-                <stat.icon size={24} color={stat.color} />
+            <FadeIn key={index} delay={index * 70} direction="up" distance={16} style={styles.statCardWrap}>
+              <View style={styles.statCard}>
+                <View style={[styles.statIcon, { backgroundColor: `${stat.color}15` }]}>
+                  <stat.icon size={24} color={stat.color} />
+                </View>
+                <Text style={styles.statValue}>{stat.value}</Text>
+                <Text style={styles.statLabel}>{stat.label}</Text>
               </View>
-              <Text style={styles.statValue}>{stat.value}</Text>
-              <Text style={styles.statLabel}>{stat.label}</Text>
-            </View>
+            </FadeIn>
           ))}
         </View>
 
@@ -231,19 +234,20 @@ export default function AdminDashboardScreen() {
           <Text style={styles.sectionTitle}>Quick Actions</Text>
           <View style={styles.actionsGrid}>
             {quickActions.map((action, index) => (
-              <TouchableOpacity
-                key={index}
-                style={[styles.actionCard, { borderLeftColor: action.color }]}
-                onPress={() => router.push(action.route as never)}
-              >
-                <View style={[styles.actionIcon, { backgroundColor: `${action.color}15` }]}>
-                  <action.icon size={20} color={action.color} />
-                </View>
-                <View style={styles.actionContent}>
-                  <Text style={styles.actionTitle}>{action.title}</Text>
-                  <Text style={styles.actionDescription}>{action.description}</Text>
-                </View>
-              </TouchableOpacity>
+              <FadeIn key={index} delay={index * 55} direction="up" distance={14}>
+                <PressableScale
+                  style={[styles.actionCard, { borderLeftColor: action.color }]}
+                  onPress={() => router.push(action.route as never)}
+                >
+                  <View style={[styles.actionIcon, { backgroundColor: `${action.color}15` }]}>
+                    <action.icon size={20} color={action.color} />
+                  </View>
+                  <View style={styles.actionContent}>
+                    <Text style={styles.actionTitle}>{action.title}</Text>
+                    <Text style={styles.actionDescription}>{action.description}</Text>
+                  </View>
+                </PressableScale>
+              </FadeIn>
             ))}
           </View>
         </View>
@@ -337,9 +341,11 @@ const styles = StyleSheet.create({
     padding: 16,
     gap: 12,
   },
-  statCard: {
+  statCardWrap: {
     flex: 1,
     minWidth: '45%',
+  },
+  statCard: {
     backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 16,

@@ -13,6 +13,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { ArrowLeft, BarChart2 } from 'lucide-react-native';
 import { colors, radii } from '../../theme/colors';
+import { FadeIn } from '../../components/animated';
 import { subjectService, Subject } from '../../services/subjectService';
 import { trendsService, SubjectTrendItem, TopicTrendItem } from '../../services/trendsService';
 
@@ -90,7 +91,7 @@ export default function TrendsScreen() {
             <ActivityIndicator color={colors.accent} style={{ marginVertical: 32 }} />
           ) : (
             <>
-              <View style={styles.card}>
+              <FadeIn delay={60} direction="up" distance={16} style={styles.card}>
                 <View style={styles.cardHead}>
                   <BarChart2 size={20} color={colors.accent} />
                   <Text style={styles.cardTitle}>By subject</Text>
@@ -105,7 +106,7 @@ export default function TrendsScreen() {
                     </View>
                   ))
                 )}
-              </View>
+              </FadeIn>
 
               <Text style={styles.filterLabel}>Filter topics by subject</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 12 }}>
@@ -136,7 +137,7 @@ export default function TrendsScreen() {
                 ))}
               </ScrollView>
 
-              <View style={styles.card}>
+              <FadeIn delay={120} direction="up" distance={16} style={styles.card}>
                 <Text style={styles.cardTitle}>Topic frequency</Text>
                 {topicTrends.length === 0 ? (
                   <Text style={styles.muted}>No topics for this filter.</Text>
@@ -150,7 +151,7 @@ export default function TrendsScreen() {
                     </View>
                   ))
                 )}
-              </View>
+              </FadeIn>
             </>
           )}
         </ScrollView>
