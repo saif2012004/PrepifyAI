@@ -13,6 +13,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { ArrowLeft, Flame, BookOpen, ChevronDown, ChevronUp } from 'lucide-react-native';
 import { colors, radii } from '../../theme/colors';
+import { FadeIn } from '../../components/animated';
 import { subjectService, Subject } from '../../services/subjectService';
 import {
   predictionService,
@@ -191,14 +192,14 @@ export default function ExamTopicsScreen() {
           )}
 
           {result && (
-            <View style={styles.summary}>
+            <FadeIn style={styles.summary} direction="up" distance={16}>
               <Text style={styles.summaryTitle}>Summary</Text>
               <Text style={styles.summaryLine}>
                 Papers: {result.past_papers_analyzed} · Questions scored: {result.total_questions_analyzed} ·
                 Topics: {result.unique_topics_found}
               </Text>
               {result.message ? <Text style={styles.summaryMsg}>{result.message}</Text> : null}
-            </View>
+            </FadeIn>
           )}
 
           {result?.recommendations?.length === 0 && !result.message ? (
@@ -209,7 +210,7 @@ export default function ExamTopicsScreen() {
             const key = `${rec.topic_name}-${idx}`;
             const open = !!expanded[key];
             return (
-              <View key={key} style={styles.card}>
+              <FadeIn key={key} delay={Math.min(idx, 10) * 55} direction="up" distance={16} style={styles.card}>
                 <TouchableOpacity
                   style={styles.cardHead}
                   onPress={() => toggle(key)}
@@ -249,7 +250,7 @@ export default function ExamTopicsScreen() {
                   ) : (
                     <Text style={styles.muted}>No textbook chunk match for this topic yet.</Text>
                   ))}
-              </View>
+              </FadeIn>
             );
           })}
         </ScrollView>

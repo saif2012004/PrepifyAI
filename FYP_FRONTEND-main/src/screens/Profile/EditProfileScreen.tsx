@@ -13,6 +13,7 @@ import { ArrowLeft } from 'lucide-react-native';
 import InputField from '../../components/InputField';
 import PrimaryButton from '../../components/PrimaryButton';
 import { useAuth } from '../../context/AuthContext';
+import { FadeIn } from '../../components/animated';
 
 export default function EditProfileScreen() {
   const router = useRouter();
@@ -71,7 +72,7 @@ export default function EditProfileScreen() {
         </View>
 
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-          <View style={styles.form}>
+          <FadeIn delay={60} direction="up" distance={18} style={styles.form}>
             <InputField
               label="Full Name"
               value={name}
@@ -124,7 +125,7 @@ export default function EditProfileScreen() {
             >
               <Text style={styles.cancelButtonText}>Cancel</Text>
             </TouchableOpacity>
-          </View>
+          </FadeIn>
         </ScrollView>
       </View>
     </SafeAreaView>

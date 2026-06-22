@@ -14,6 +14,7 @@ import {
   CheckCircle2,
 } from 'lucide-react-native';
 import { colors, radii } from '../../theme/colors';
+import { FadeIn } from '../../components/animated';
 
 const FEATURES: {
   title: string;
@@ -83,39 +84,42 @@ export default function RevisionPlanScreen() {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          <LinearGradient
-            colors={['rgba(99,102,241,0.35)', 'rgba(49,46,129,0.5)', colors.surface]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.hero}
-          >
-            <View style={styles.heroBadge}>
-              <Sparkles size={22} color={colors.accent} />
-            </View>
-            <Text style={styles.heroKicker}>Smart scheduling</Text>
-            <Text style={styles.heroTitle}>Plan your revision like a pro</Text>
-            <Text style={styles.heroSub}>
-              One guided flow for a full timetable — revision blocks, practice, spaced review, and rest days.
-            </Text>
-          </LinearGradient>
+          <FadeIn delay={60} direction="up" distance={20}>
+            <LinearGradient
+              colors={['rgba(99,102,241,0.35)', 'rgba(49,46,129,0.5)', colors.surface]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.hero}
+            >
+              <View style={styles.heroBadge}>
+                <Sparkles size={22} color={colors.accent} />
+              </View>
+              <Text style={styles.heroKicker}>Smart scheduling</Text>
+              <Text style={styles.heroTitle}>Plan your revision like a pro</Text>
+              <Text style={styles.heroSub}>
+                One guided flow for a full timetable — revision blocks, practice, spaced review, and rest days.
+              </Text>
+            </LinearGradient>
+          </FadeIn>
 
           <Text style={styles.sectionLabel}>What you get</Text>
           <View style={styles.card}>
             {FEATURES.map((f, i) => {
               const Icon = f.Icon;
               return (
-                <View
-                  key={f.title}
-                  style={[styles.featureRow, i < FEATURES.length - 1 && styles.featureRowBorder]}
-                >
-                  <View style={[styles.featureIcon, { backgroundColor: f.iconBg }]}>
-                    <Icon size={20} color={f.color} />
+                <FadeIn key={f.title} delay={120 + i * 70} direction="up" distance={14}>
+                  <View
+                    style={[styles.featureRow, i < FEATURES.length - 1 && styles.featureRowBorder]}
+                  >
+                    <View style={[styles.featureIcon, { backgroundColor: f.iconBg }]}>
+                      <Icon size={20} color={f.color} />
+                    </View>
+                    <View style={styles.featureText}>
+                      <Text style={styles.featureTitle}>{f.title}</Text>
+                      <Text style={styles.featureBody}>{f.body}</Text>
+                    </View>
                   </View>
-                  <View style={styles.featureText}>
-                    <Text style={styles.featureTitle}>{f.title}</Text>
-                    <Text style={styles.featureBody}>{f.body}</Text>
-                  </View>
-                </View>
+                </FadeIn>
               );
             })}
           </View>
@@ -145,21 +149,23 @@ export default function RevisionPlanScreen() {
             </View>
           </View>
 
-          <TouchableOpacity
-            style={styles.btn}
-            onPress={() => router.push('/adaptive/revision-planner' as never)}
-            activeOpacity={0.85}
-          >
-            <LinearGradient
-              colors={[colors.primary, colors.gradientEnd]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.btnGradient}
+          <FadeIn delay={260} direction="up" distance={18}>
+            <TouchableOpacity
+              style={styles.btn}
+              onPress={() => router.push('/adaptive/revision-planner' as never)}
+              activeOpacity={0.85}
             >
-              <Sparkles size={20} color="#fff" />
-              <Text style={styles.btnTxt}>Open AI revision planner</Text>
-            </LinearGradient>
-          </TouchableOpacity>
+              <LinearGradient
+                colors={[colors.primary, colors.gradientEnd]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.btnGradient}
+              >
+                <Sparkles size={20} color="#fff" />
+                <Text style={styles.btnTxt}>Open AI revision planner</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </FadeIn>
 
           <View style={styles.trustRow}>
             <CheckCircle2 size={16} color={colors.textSubtle} />
