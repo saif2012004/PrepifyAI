@@ -19,6 +19,7 @@ import {
 } from 'lucide-react-native';
 import { apiClient } from '../../services/api';
 import { subjectService, Subject } from '../../services/subjectService';
+import { FadeIn } from '../../components/animated';
 
 type PendingRow = {
   question_id: number;
@@ -174,14 +175,14 @@ export default function ValidateContentScreen() {
                 <Text style={styles.emptyText}>No pending questions to review</Text>
               </View>
             ) : (
-              questions.map((q) => {
+              questions.map((q, index) => {
                 const diff = diffNorm(q.difficulty_level);
                 const subjectName = subjects[q.subject_id] ?? 'Subject not in catalog';
                 const open = selectedId === q.question_id;
                 const busy = actingId === q.question_id;
                 return (
+                  <FadeIn key={q.question_id} delay={Math.min(index, 10) * 45} direction="up" distance={14}>
                   <TouchableOpacity
-                    key={q.question_id}
                     style={[styles.questionCard, open && styles.questionCardSelected]}
                     onPress={() => setSelectedId(open ? null : q.question_id)}
                     activeOpacity={0.9}
@@ -261,6 +262,7 @@ export default function ValidateContentScreen() {
                       </View>
                     )}
                   </TouchableOpacity>
+                  </FadeIn>
                 );
               })
             )}

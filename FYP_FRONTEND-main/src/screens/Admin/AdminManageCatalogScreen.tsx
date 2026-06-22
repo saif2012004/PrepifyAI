@@ -46,6 +46,7 @@ import {
   PastPaperQuestionUpdateBody,
 } from '../../services/adminPastPaperService';
 import { colors, radii } from '../../theme/colors';
+import { FadeIn } from '../../components/animated';
 
 export default function AdminManageCatalogScreen() {
   const router = useRouter();
@@ -548,8 +549,8 @@ export default function AdminManageCatalogScreen() {
         {loadingSubjects ? (
           <ActivityIndicator color={colors.accent} style={{ marginVertical: 20 }} />
         ) : (
-          subjects.map((s) => (
-            <View key={s.subject_id} style={styles.card}>
+          subjects.map((s, index) => (
+            <FadeIn key={s.subject_id} delay={Math.min(index, 10) * 45} direction="up" distance={14} style={styles.card}>
               <Text style={styles.cardTitle}>{s.subject_name}</Text>
               <Text style={styles.cardMeta}>
                 Class {s.class_level} · {s.board} · book {s.book_version}
@@ -564,7 +565,7 @@ export default function AdminManageCatalogScreen() {
                   <Text style={[styles.iconBtnTxt, { color: colors.danger }]}>Delete</Text>
                 </TouchableOpacity>
               </View>
-            </View>
+            </FadeIn>
           ))
         )}
 
@@ -657,8 +658,8 @@ export default function AdminManageCatalogScreen() {
             <Text style={styles.muted}>No past papers for this subject yet.</Text>
           </View>
         ) : (
-          papers.map((p) => (
-            <View key={p.paper_id} style={styles.card}>
+          papers.map((p, index) => (
+            <FadeIn key={p.paper_id} delay={Math.min(index, 10) * 45} direction="up" distance={14} style={styles.card}>
               <TouchableOpacity
                 style={styles.paperHeaderRow}
                 onPress={() => void togglePaperExpanded(p.paper_id)}
@@ -749,7 +750,7 @@ export default function AdminManageCatalogScreen() {
                   )}
                 </View>
               )}
-            </View>
+            </FadeIn>
           ))
         )}
 
@@ -769,8 +770,8 @@ export default function AdminManageCatalogScreen() {
             <Text style={styles.muted}>No PDFs for this subject. Use Admin → Upload student books.</Text>
           </View>
         ) : (
-          books.map((b) => (
-            <View key={b.book_id} style={styles.card}>
+          books.map((b, index) => (
+            <FadeIn key={b.book_id} delay={Math.min(index, 10) * 45} direction="up" distance={14} style={styles.card}>
               <Text style={styles.cardTitle} numberOfLines={2}>
                 {b.title}
               </Text>
@@ -790,7 +791,7 @@ export default function AdminManageCatalogScreen() {
                   <Text style={[styles.iconBtnTxt, { color: colors.danger }]}>Delete</Text>
                 </TouchableOpacity>
               </View>
-            </View>
+            </FadeIn>
           ))
         )}
       </ScrollView>

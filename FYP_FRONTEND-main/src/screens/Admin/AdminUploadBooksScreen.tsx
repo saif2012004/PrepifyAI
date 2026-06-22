@@ -11,6 +11,7 @@ import type { CatalogBoardOption } from '../../constants/catalogBoards';
 import { uploadStudentBookPdf } from '../../services/adminBookLibraryService';
 import type { PickedPdf } from '../../services/adminPdfForm';
 import { colors, radii } from '../../theme/colors';
+import { FadeIn } from '../../components/animated';
 
 export default function AdminUploadBooksScreen() {
   const router = useRouter();
@@ -92,7 +93,7 @@ export default function AdminUploadBooksScreen() {
           extraction).
         </Text>
 
-        <View style={styles.card}>
+        <FadeIn delay={60} direction="up" distance={16} style={styles.card}>
           <InputField label="Class level" value={classLevel} onChangeText={setClassLevel} placeholder="9–12" appearance="dark" />
           <AdminBoardChips value={board} onChange={setBoard} />
           <InputField
@@ -102,7 +103,7 @@ export default function AdminUploadBooksScreen() {
             placeholder="Must match catalog subject name"
             appearance="dark"
           />
-        </View>
+        </FadeIn>
 
         <InputField
           label="Display title (optional)"

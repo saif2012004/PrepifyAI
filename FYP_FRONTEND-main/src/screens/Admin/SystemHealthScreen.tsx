@@ -19,6 +19,7 @@ import {
   CheckCircle,
   AlertTriangle,
 } from 'lucide-react-native';
+import { FadeIn, AnimatedProgressBar } from '../../components/animated';
 
 const systemStatus = {
   status: 'healthy',
@@ -88,7 +89,7 @@ export default function SystemHealthScreen() {
 
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           {/* Overall Status */}
-          <View style={styles.statusCard}>
+          <FadeIn delay={60} direction="up" distance={16} style={styles.statusCard}>
             <View style={styles.statusHeader}>
               <View style={styles.statusIndicator}>
                 <View style={styles.statusDot} />
@@ -99,43 +100,51 @@ export default function SystemHealthScreen() {
             <Text style={styles.uptimeText}>
               Uptime: {systemStatus.uptime}% • Response Time: {systemStatus.apiResponseTime}ms
             </Text>
-          </View>
+          </FadeIn>
 
           {/* Key Metrics */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Key Metrics</Text>
             <View style={styles.metricsGrid}>
-              <View style={styles.metricCard}>
-                <View style={[styles.metricIcon, { backgroundColor: '#DBEAFE' }]}>
-                  <Server size={20} color="#2563EB" />
+              <FadeIn delay={120} direction="up" distance={14} style={styles.metricCardWrap}>
+                <View style={styles.metricCard}>
+                  <View style={[styles.metricIcon, { backgroundColor: '#DBEAFE' }]}>
+                    <Server size={20} color="#2563EB" />
+                  </View>
+                  <Text style={styles.metricValue}>{systemStatus.apiResponseTime}ms</Text>
+                  <Text style={styles.metricLabel}>Response</Text>
                 </View>
-                <Text style={styles.metricValue}>{systemStatus.apiResponseTime}ms</Text>
-                <Text style={styles.metricLabel}>Response</Text>
-              </View>
+              </FadeIn>
 
-              <View style={styles.metricCard}>
-                <View style={[styles.metricIcon, { backgroundColor: '#D1FAE5' }]}>
-                  <Database size={20} color="#10B981" />
+              <FadeIn delay={180} direction="up" distance={14} style={styles.metricCardWrap}>
+                <View style={styles.metricCard}>
+                  <View style={[styles.metricIcon, { backgroundColor: '#D1FAE5' }]}>
+                    <Database size={20} color="#10B981" />
+                  </View>
+                  <Text style={styles.metricValue}>Connected</Text>
+                  <Text style={styles.metricLabel}>Database</Text>
                 </View>
-                <Text style={styles.metricValue}>Connected</Text>
-                <Text style={styles.metricLabel}>Database</Text>
-              </View>
+              </FadeIn>
 
-              <View style={styles.metricCard}>
-                <View style={[styles.metricIcon, { backgroundColor: '#FEE2E2' }]}>
-                  <Activity size={20} color="#EF4444" />
+              <FadeIn delay={240} direction="up" distance={14} style={styles.metricCardWrap}>
+                <View style={styles.metricCard}>
+                  <View style={[styles.metricIcon, { backgroundColor: '#FEE2E2' }]}>
+                    <Activity size={20} color="#EF4444" />
+                  </View>
+                  <Text style={styles.metricValue}>Active</Text>
+                  <Text style={styles.metricLabel}>AI Model</Text>
                 </View>
-                <Text style={styles.metricValue}>Active</Text>
-                <Text style={styles.metricLabel}>AI Model</Text>
-              </View>
+              </FadeIn>
 
-              <View style={styles.metricCard}>
-                <View style={[styles.metricIcon, { backgroundColor: '#E9D5FF' }]}>
-                  <Users size={20} color="#8B5CF6" />
+              <FadeIn delay={300} direction="up" distance={14} style={styles.metricCardWrap}>
+                <View style={styles.metricCard}>
+                  <View style={[styles.metricIcon, { backgroundColor: '#E9D5FF' }]}>
+                    <Users size={20} color="#8B5CF6" />
+                  </View>
+                  <Text style={styles.metricValue}>{systemStatus.activeUsers}</Text>
+                  <Text style={styles.metricLabel}>Active Users</Text>
                 </View>
-                <Text style={styles.metricValue}>{systemStatus.activeUsers}</Text>
-                <Text style={styles.metricLabel}>Active Users</Text>
-              </View>
+              </FadeIn>
             </View>
           </View>
 
@@ -149,14 +158,13 @@ export default function SystemHealthScreen() {
                   {systemStatus.storageUsed}GB / {systemStatus.storageTotal}GB
                 </Text>
               </View>
-              <View style={styles.storageBar}>
-                <View
-                  style={[
-                    styles.storageFill,
-                    { width: `${(systemStatus.storageUsed / systemStatus.storageTotal) * 100}%` },
-                  ]}
-                />
-              </View>
+              <AnimatedProgressBar
+                progress={systemStatus.storageUsed / systemStatus.storageTotal}
+                height={8}
+                color="#3B82F6"
+                trackColor="#F3F4F6"
+                style={{ marginBottom: 8 }}
+              />
               <Text style={styles.storagePercentage}>
                 {((systemStatus.storageUsed / systemStatus.storageTotal) * 100).toFixed(1)}% Used
               </Text>
@@ -308,9 +316,11 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: 12,
   },
-  metricCard: {
+  metricCardWrap: {
     flex: 1,
     minWidth: '45%',
+  },
+  metricCard: {
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 16,
@@ -349,18 +359,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#374151',
     marginLeft: 8,
-  },
-  storageBar: {
-    height: 8,
-    backgroundColor: '#F3F4F6',
-    borderRadius: 4,
-    overflow: 'hidden',
-    marginBottom: 8,
-  },
-  storageFill: {
-    height: '100%',
-    backgroundColor: '#3B82F6',
-    borderRadius: 4,
   },
   storagePercentage: {
     fontSize: 12,

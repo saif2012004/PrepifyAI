@@ -17,6 +17,7 @@ import {
   type PredictionServiceStatus,
 } from '../../services/adminDashboardService';
 import { subjectService, type Subject } from '../../services/subjectService';
+import { FadeIn } from '../../components/animated';
 
 function avgF1(rows: AccuracyRunRow[]): number | null {
   const vals = rows.map((r) => r.f1).filter((x): x is number => typeof x === 'number' && !Number.isNaN(x));
@@ -152,16 +153,18 @@ export default function MonitorAccuracyScreen() {
             <Text style={styles.sectionTitle}>Prediction engine</Text>
             <View style={styles.statsGrid}>
               {statCards.map((stat, index) => (
-                <View key={index} style={styles.statCard}>
-                  <View style={[styles.statIconContainer, { backgroundColor: `${stat.color}15` }]}>
-                    <stat.icon size={24} color={stat.color} />
+                <FadeIn key={index} delay={index * 70} direction="up" distance={14} style={styles.statCardWrap}>
+                  <View style={styles.statCard}>
+                    <View style={[styles.statIconContainer, { backgroundColor: `${stat.color}15` }]}>
+                      <stat.icon size={24} color={stat.color} />
+                    </View>
+                    <Text style={styles.statValue} numberOfLines={2}>
+                      {stat.value}
+                    </Text>
+                    <Text style={styles.statLabel}>{stat.label}</Text>
+                    {!!stat.sub && <Text style={styles.statSub}>{stat.sub}</Text>}
                   </View>
-                  <Text style={styles.statValue} numberOfLines={2}>
-                    {stat.value}
-                  </Text>
-                  <Text style={styles.statLabel}>{stat.label}</Text>
-                  {!!stat.sub && <Text style={styles.statSub}>{stat.sub}</Text>}
-                </View>
+                </FadeIn>
               ))}
             </View>
 
@@ -176,7 +179,7 @@ export default function MonitorAccuracyScreen() {
                 <Text style={styles.emptyText}>No evaluation runs in the database yet.</Text>
               </View>
             ) : (
-              <View style={styles.card}>
+              <FadeIn direction="up" distance={16} style={styles.card}>
                 {runs.map((r, i) => (
                   <View
                     key={`${r.subject_id}-${r.exam_year}-${r.created_at ?? i}`}
@@ -202,7 +205,7 @@ export default function MonitorAccuracyScreen() {
                     </View>
                   </View>
                 ))}
-              </View>
+              </FadeIn>
             )}
           </ScrollView>
         )}
@@ -234,9 +237,11 @@ const styles = StyleSheet.create({
   sectionTitle: { fontSize: 16, fontWeight: 'bold', color: '#111827', marginBottom: 12 },
   hint: { fontSize: 12, color: '#6B7280', marginBottom: 12, lineHeight: 18 },
   statsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 20 },
-  statCard: {
+  statCardWrap: {
     flex: 1,
     minWidth: '45%',
+  },
+  statCard: {
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 16,

@@ -15,6 +15,7 @@ import { Shield } from 'lucide-react-native';
 import { useAuth } from '../../context/AuthContext';
 import InputField from '../../components/InputField';
 import PrimaryButton from '../../components/PrimaryButton';
+import { FadeIn } from '../../components/animated';
 
 export default function AdminLoginScreen() {
   const router = useRouter();
@@ -53,18 +54,20 @@ export default function AdminLoginScreen() {
           showsVerticalScrollIndicator={false}
         >
           {/* Header */}
-          <View style={styles.header}>
-            <View style={styles.iconContainer}>
-              <Shield size={48} color="#2563EB" strokeWidth={2} />
+          <FadeIn delay={60} direction="down" distance={20}>
+            <View style={styles.header}>
+              <View style={styles.iconContainer}>
+                <Shield size={48} color="#2563EB" strokeWidth={2} />
+              </View>
+              <Text style={styles.title}>Admin Login</Text>
+              <Text style={styles.subtitle}>
+                Sign in to access the admin panel
+              </Text>
             </View>
-            <Text style={styles.title}>Admin Login</Text>
-            <Text style={styles.subtitle}>
-              Sign in to access the admin panel
-            </Text>
-          </View>
+          </FadeIn>
 
           {/* Form */}
-          <View style={styles.form}>
+          <FadeIn delay={180} direction="up" distance={22} style={styles.form}>
             <InputField
               label="Email Address"
               value={email}
@@ -87,7 +90,7 @@ export default function AdminLoginScreen() {
               onPress={handleLogin}
               disabled={loading}
             />
-          </View>
+          </FadeIn>
 
           {/* Development Info */}
           <View style={styles.devInfo}>

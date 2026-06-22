@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { ArrowLeft, UserX } from 'lucide-react-native';
 import { apiClient } from '../../services/api';
+import { FadeIn } from '../../components/animated';
 
 type UserRow = {
   user_id: number;
@@ -125,31 +126,33 @@ export default function AdminUsersScreen() {
           {users.length === 0 ? (
             <Text style={styles.empty}>No users returned.</Text>
           ) : (
-            users.map((u) => (
-              <View key={u.user_id} style={styles.card}>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.name}>{u.name}</Text>
-                  <Text style={styles.email}>{u.email}</Text>
-                  <Text style={styles.meta}>
-                    {u.role}
-                    {u.class_level ? ` · Class ${u.class_level}` : ''}
-                    {u.is_active === 0 ? ' · Inactive' : ''}
-                  </Text>
+            users.map((u, index) => (
+              <FadeIn key={u.user_id} delay={Math.min(index, 12) * 40} direction="up" distance={14}>
+                <View style={styles.card}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.name}>{u.name}</Text>
+                    <Text style={styles.email}>{u.email}</Text>
+                    <Text style={styles.meta}>
+                      {u.role}
+                      {u.class_level ? ` · Class ${u.class_level}` : ''}
+                      {u.is_active === 0 ? ' · Inactive' : ''}
+                    </Text>
+                  </View>
+                  {u.is_active !== 0 && (
+                    <TouchableOpacity
+                      style={styles.deact}
+                      disabled={actingId === u.user_id}
+                      onPress={() => deactivate(u)}
+                    >
+                      {actingId === u.user_id ? (
+                        <ActivityIndicator color="#B91C1C" />
+                      ) : (
+                        <UserX size={20} color="#B91C1C" />
+                      )}
+                    </TouchableOpacity>
+                  )}
                 </View>
-                {u.is_active !== 0 && (
-                  <TouchableOpacity
-                    style={styles.deact}
-                    disabled={actingId === u.user_id}
-                    onPress={() => deactivate(u)}
-                  >
-                    {actingId === u.user_id ? (
-                      <ActivityIndicator color="#B91C1C" />
-                    ) : (
-                      <UserX size={20} color="#B91C1C" />
-                    )}
-                  </TouchableOpacity>
-                )}
-              </View>
+              </FadeIn>
             ))
           )}
         </ScrollView>

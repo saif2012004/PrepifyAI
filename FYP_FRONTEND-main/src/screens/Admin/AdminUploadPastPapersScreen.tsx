@@ -19,6 +19,7 @@ import type { CatalogBoardOption } from '../../constants/catalogBoards';
 import type { PickedPdf } from '../../services/adminPdfForm';
 import { uploadPastPaperPdfLibraryOnly } from '../../services/adminPastPaperService';
 import { colors, radii } from '../../theme/colors';
+import { FadeIn } from '../../components/animated';
 
 const PAST_PAPER_BOARD_OPTIONS: readonly CatalogBoardOption[] = ['FBISE'];
 
@@ -119,7 +120,7 @@ export default function AdminUploadPastPapersScreen() {
           on the server. Students read the full paper under <Text style={styles.bold}>Home → Past papers</Text>.
         </Text>
 
-        <View style={styles.card}>
+        <FadeIn delay={60} direction="up" distance={16} style={styles.card}>
           <InputField label="Class level" value={classLevel} onChangeText={setClassLevel} placeholder="9–12" appearance="dark" />
           <AdminBoardChips value={board} onChange={setBoard} options={PAST_PAPER_BOARD_OPTIONS} />
           <InputField
@@ -137,7 +138,7 @@ export default function AdminUploadPastPapersScreen() {
             keyboardType="numeric"
             appearance="dark"
           />
-        </View>
+        </FadeIn>
 
         <View style={styles.publishRow}>
           <View style={{ flex: 1 }}>

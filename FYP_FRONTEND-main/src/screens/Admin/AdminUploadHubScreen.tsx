@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { ArrowLeft, FileStack, BookOpen } from 'lucide-react-native';
 import { colors, radii } from '../../theme/colors';
+import { FadeIn, PressableScale } from '../../components/animated';
 
 export default function AdminUploadHubScreen() {
   const router = useRouter();
@@ -23,38 +24,40 @@ export default function AdminUploadHubScreen() {
           Past papers and student library PDFs use different tools and workflows. Choose one.
         </Text>
 
-        <TouchableOpacity
-          style={styles.card}
-          onPress={() => router.push('/admin/upload-papers')}
-          activeOpacity={0.85}
-        >
-          <View style={[styles.iconWrap, { backgroundColor: 'rgba(59,130,246,0.15)' }]}>
-            <FileStack size={28} color="#3B82F6" />
-          </View>
-          <View style={styles.cardText}>
-            <Text style={styles.cardTitle}>Past papers</Text>
-            <Text style={styles.cardDesc}>
-              PDF upload (like books): questions are extracted on the server. Students see them under Home → Past papers
-              for the same subject.
-            </Text>
-          </View>
-          <Text style={styles.chev}>→</Text>
-        </TouchableOpacity>
+        <FadeIn delay={80} direction="up" distance={18}>
+          <PressableScale
+            style={styles.card}
+            onPress={() => router.push('/admin/upload-papers')}
+          >
+            <View style={[styles.iconWrap, { backgroundColor: 'rgba(59,130,246,0.15)' }]}>
+              <FileStack size={28} color="#3B82F6" />
+            </View>
+            <View style={styles.cardText}>
+              <Text style={styles.cardTitle}>Past papers</Text>
+              <Text style={styles.cardDesc}>
+                PDF upload (like books): questions are extracted on the server. Students see them under Home → Past papers
+                for the same subject.
+              </Text>
+            </View>
+            <Text style={styles.chev}>→</Text>
+          </PressableScale>
+        </FadeIn>
 
-        <TouchableOpacity
-          style={styles.card}
-          onPress={() => router.push('/admin/upload-books')}
-          activeOpacity={0.85}
-        >
-          <View style={[styles.iconWrap, { backgroundColor: 'rgba(16,185,129,0.15)' }]}>
-            <BookOpen size={28} color="#10B981" />
-          </View>
-          <View style={styles.cardText}>
-            <Text style={styles.cardTitle}>Student books (PDF)</Text>
-            <Text style={styles.cardDesc}>Full textbook PDF for the library — board is FBISE or Punjab Board only.</Text>
-          </View>
-          <Text style={styles.chev}>→</Text>
-        </TouchableOpacity>
+        <FadeIn delay={150} direction="up" distance={18}>
+          <PressableScale
+            style={styles.card}
+            onPress={() => router.push('/admin/upload-books')}
+          >
+            <View style={[styles.iconWrap, { backgroundColor: 'rgba(16,185,129,0.15)' }]}>
+              <BookOpen size={28} color="#10B981" />
+            </View>
+            <View style={styles.cardText}>
+              <Text style={styles.cardTitle}>Student books (PDF)</Text>
+              <Text style={styles.cardDesc}>Full textbook PDF for the library — board is FBISE or Punjab Board only.</Text>
+            </View>
+            <Text style={styles.chev}>→</Text>
+          </PressableScale>
+        </FadeIn>
       </ScrollView>
     </SafeAreaView>
   );
