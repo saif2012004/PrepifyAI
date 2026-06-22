@@ -127,3 +127,6 @@ Thumbs.db
 # Project specific
 uploads/
 logs/
+output/
+tmp_*.txt
+*.tmp
