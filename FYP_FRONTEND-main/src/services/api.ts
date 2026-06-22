@@ -262,7 +262,9 @@ const API_BASE_URL = finalizeNativeApiBase(getApiBaseUrl());
 const API_PREFIX = process.env.EXPO_PUBLIC_API_PREFIX || '/api/v1';
 export const FULL_API_URL = `${API_BASE_URL}${API_PREFIX}`;
 
-console.log('Backend URL:', FULL_API_URL, '(Platform:', Platform.OS + ')');
+if (typeof __DEV__ !== 'undefined' && __DEV__) {
+  console.log('Backend URL:', FULL_API_URL, '(Platform:', Platform.OS + ')');
+}
 
 function isLikelyNetworkFailure(err: unknown): boolean {
   if (err instanceof TypeError) return true;
