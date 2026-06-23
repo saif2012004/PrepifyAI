@@ -7,7 +7,6 @@ import {
   Platform,
   ScrollView,
   TouchableOpacity,
-  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -29,6 +28,7 @@ export default function RegisterScreen() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleGoogleSuccess = (profile: {
     id?: string;
@@ -42,39 +42,37 @@ export default function RegisterScreen() {
   };
 
   const handleRegister = async () => {
+    setError(null);
     const emailTrimmed = email.trim();
     if (!name || !emailTrimmed || !password || !confirmPassword) {
-      Alert.alert('Missing fields', 'Please fill in all fields');
+      setError('Please fill in all fields.');
       return;
     }
     const typo = emailDomainTypoHint(emailTrimmed);
     if (typo) {
-      Alert.alert('Check your email', typo);
+      setError(typo);
       return;
     }
 
     if (password !== confirmPassword) {
-      Alert.alert('Passwords do not match', 'Both password fields must match.');
+      setError('Both password fields must match.');
       return;
     }
 
     if (password.length < 8) {
-      Alert.alert('Password too short', 'Use at least 8 characters.');
+      setError('Password must be at least 8 characters.');
       return;
     }
 
     setLoading(true);
     try {
       await register(name, emailTrimmed, password);
-      Alert.alert(
-        'Registered successfully',
-        'Your account is ready and you are signed in.',
-        [{ text: 'Continue', onPress: () => router.replace('/(tabs)') }]
-      );
-    } catch (error: unknown) {
+      // Navigate directly: Alert.alert callbacks do not fire on React Native Web.
+      router.replace('/(tabs)');
+    } catch (err: unknown) {
       const msg =
-        error instanceof Error ? error.message : 'Registration failed. Please try again.';
-      Alert.alert('Could not register', msg);
+        err instanceof Error ? err.message : 'Registration failed. Please try again.';
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -152,6 +150,12 @@ export default function RegisterScreen() {
                 appearance="dark"
               />
 
+              {error ? (
+                <View style={styles.errorBanner}>
+                  <Text style={styles.errorText}>{error}</Text>
+                </View>
+              ) : null}
+
               <View style={{ marginTop: 8 }}>
                 <PrimaryButton
                   title="Create account"
@@ -220,6 +224,17 @@ const styles = StyleSheet.create({
   divider: { flexDirection: 'row', alignItems: 'center', marginVertical: 20 },
   dividerLine: { flex: 1, height: 1, backgroundColor: colors.border },
   dividerText: { marginHorizontal: 14, color: colors.textSubtle, fontSize: 13 },
+  errorBanner: {
+    marginTop: 8,
+    marginBottom: 4,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: radii.md,
+    borderWidth: 1,
+    borderColor: colors.danger,
+    backgroundColor: 'rgba(248,113,113,0.12)',
+  },
+  errorText: { color: colors.danger, fontSize: 13, textAlign: 'center' },
   footer: { flexDirection: 'row', justifyContent: 'center', marginTop: 22, flexWrap: 'wrap' },
   footerMuted: { color: colors.textMuted, fontSize: 14 },
   link: { color: colors.accent, fontSize: 14, fontWeight: '700' },

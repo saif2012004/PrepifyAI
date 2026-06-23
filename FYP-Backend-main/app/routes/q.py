@@ -14,7 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, text
 
 from app.core.config import settings
-from app.database import get_db
+from app.database import get_db, AsyncSessionLocal
 from app.models.generated_question import GeneratedQuestion
 from app.models.question_generation_job import QuestionGenerationJob
 from app.models.user import User
@@ -499,13 +499,23 @@ async def generate_topic_set(req: QuestionRequest, db: AsyncSession = Depends(ge
     if (req.difficulty or "").strip().lower() not in ("hard",):
         long_req.difficulty = "medium"
 
-    mcq_res = await get_questions(mcq_req, db)
+    # Each batch is an independent Groq + RAG round-trip. Run them concurrently so a full
+    # paper takes ~one batch worth of time instead of the sum. Each needs its OWN session —
+    # SQLAlchemy AsyncSession is not safe to share across concurrent tasks.
+    async def _generate(sub_req: QuestionRequest) -> GeneratedQuestionsResponse:
+        async with AsyncSessionLocal() as session:
+            return await get_questions(sub_req, session)
+
     if exam_type_norm in ("mdcat", "ecat"):
+        mcq_res = await _generate(mcq_req)
         short_res = GeneratedQuestionsResponse(questions=[], retrieval_sources=mcq_res.retrieval_sources)
         long_res = GeneratedQuestionsResponse(questions=[], retrieval_sources=mcq_res.retrieval_sources)
     else:
-        short_res = await get_questions(short_req, db)
-        long_res = await get_questions(long_req, db)
+        mcq_res, short_res, long_res = await asyncio.gather(
+            _generate(mcq_req),
+            _generate(short_req),
+            _generate(long_req),
+        )
 
     # Keep retrieval sources from MCQ run (same topic/context base).
     return TopicQuestionSetResponse(
@@ -549,28 +559,45 @@ async def submit_answer(
 
     # Guest mode: evaluate heuristically without requiring login or saving progress.
     if current_user is None:
-        ua = (answer_submission.user_answer or "").strip().lower()
-        ca = (question.correct_answer or "").strip().lower()
+        ua = (answer_submission.user_answer or "").strip()
+        ca = (question.correct_answer or "").strip()
+        qtype = (question.question_type or "").strip()
+        max_marks = float(question.marks or 5)
         if not ua:
             return QuestionAnswerResponse(
                 is_correct=False,
                 score_percentage=0.0,
                 score_marks=0.0,
-                max_marks=float(question.marks or 5),
+                max_marks=max_marks,
                 explanation="No answer provided.",
                 correct_answer=question.correct_answer or "",
                 gamification=None,
             )
-        overlap = 0.0
-        if ca:
-            ca_tokens = {t for t in ca.split() if len(t) > 2}
-            ua_tokens = {t for t in ua.split() if len(t) > 2}
-            overlap = (len(ca_tokens & ua_tokens) / max(1, len(ca_tokens))) * 100
-        score_pct = max(10.0, min(100.0, overlap if overlap > 0 else 35.0))
-        max_marks = float(question.marks or 5)
+
+        if qtype == "MCQ":
+            # Key-based check, mirroring the logged-in grader: single-letter answers
+            # compare as letters (A–D); otherwise fall back to text containment.
+            if len(ca) == 1 and ca.upper() in {"A", "B", "C", "D"}:
+                is_correct = ca.upper() == ua.upper()
+            else:
+                is_correct = bool(ca) and (ca.lower() in ua.lower() or ua.lower() in ca.lower())
+            score_pct = 100.0 if is_correct else 0.0
+        else:
+            # Short/Long: no semantic model in guest mode, so approximate with
+            # containment (exact key match) then token overlap.
+            cal, ual = ca.lower(), ua.lower()
+            if cal and (cal in ual or ual in cal):
+                score_pct = 100.0
+            else:
+                ca_tokens = {t for t in cal.split() if len(t) > 2}
+                ua_tokens = {t for t in ual.split() if len(t) > 2}
+                overlap = (len(ca_tokens & ua_tokens) / max(1, len(ca_tokens))) * 100 if ca_tokens else 0.0
+                score_pct = round(max(0.0, min(100.0, overlap)), 1)
+            is_correct = score_pct >= 50.0
+
         score_marks = round((score_pct / 100.0) * max_marks, 2)
         return QuestionAnswerResponse(
-            is_correct=score_pct >= 50.0,
+            is_correct=is_correct,
             score_percentage=round(score_pct, 1),
             score_marks=score_marks,
             max_marks=max_marks,

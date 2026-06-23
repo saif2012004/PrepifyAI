@@ -146,7 +146,10 @@ def sync_generate_question_batch(
     all_raw: list[dict[str, Any]] = []
     remaining = n_total
     no_progress_rounds = 0
-    max_rounds = max(4, n_total * 3)
+    # Bounded so a weak/under-producing model can't trigger a long storm of Groq calls.
+    # A capable model returns the full batch in round 1; this just allows a couple of
+    # top-up rounds before we accept a partial set. Override via QUESTION_GENERATION_MAX_ROUNDS.
+    max_rounds = max(2, int(getattr(settings, "QUESTION_GENERATION_MAX_ROUNDS", 3) or 3))
     rounds = 0
     while remaining > 0 and rounds < max_rounds:
         rounds += 1
@@ -186,7 +189,9 @@ def sync_generate_question_batch(
         )
         backfill_no_progress = 0
         backfill_rounds = 0
-        max_backfill_rounds = max(4, remaining * 3)
+        # Cap supplemental rounds too — accept a slightly-short set rather than
+        # spending minutes chasing the last question(s). Override via env if needed.
+        max_backfill_rounds = max(2, int(getattr(settings, "QUESTION_GENERATION_MAX_BACKFILL_ROUNDS", 2) or 2))
         while remaining > 0 and backfill_rounds < max_backfill_rounds:
             backfill_rounds += 1
             chunk_n = min(batch_cap, remaining)
