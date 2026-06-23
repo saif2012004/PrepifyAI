@@ -12,8 +12,19 @@ Env overrides: UVICORN_HOST (default 0.0.0.0), UVICORN_PORT (default 8001)
 """
 from __future__ import annotations
 
-import asyncio
 import os
+
+# faiss-cpu (OpenBLAS) and torch (MKL/OpenMP) both ship native math runtimes; on
+# Windows they collide and crash the process ("OpenBLAS error: Memory allocation
+# still failed" / segfault) when the retriever warms up. Capping thread pools and
+# allowing the duplicate OpenMP runtime makes them coexist. Must be set before the
+# native libs load, so do it at the very top.
+os.environ.setdefault("OMP_NUM_THREADS", "1")
+os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")
+os.environ.setdefault("MKL_NUM_THREADS", "1")
+os.environ.setdefault("KMP_DUPLICATE_LIB_OK", "TRUE")
+
+import asyncio
 import selectors
 import sys
 
