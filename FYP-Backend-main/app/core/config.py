@@ -55,8 +55,10 @@ class Settings(BaseSettings):
 
     # Optional: Groq API for LLM question generation (POST .../questions/generate-questions/)
     GROQ_API_KEY: Optional[str] = None
-    # Faster default: llama-3.1-8b-instant. For higher quality (slower): llama-3.3-70b-versatile
-    GROQ_QUESTION_MODEL: str = "llama-3.1-8b-instant"
+    # Default: llama-3.3-70b-versatile — returns the full requested count + valid JSON in
+    # one shot, which avoids the slow backfill/retry rounds the small 8B model triggered.
+    # Drop to llama-3.1-8b-instant (faster per call) only if Groq free-tier rate limits bite.
+    GROQ_QUESTION_MODEL: str = "llama-3.3-70b-versatile"
     # When true, Groq uses JSON object mode (fewer malformed responses / fewer 502s from parse errors).
     GROQ_JSON_OBJECT_MODE: bool = True
     # Base seconds for /questions/generate-questions/ (used with HARD_CAP below).
